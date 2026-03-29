@@ -6,10 +6,12 @@ from datetime import datetime
 class SupabaseManager:
     def __init__(self):
         self.supabase_url = os.getenv('SUPABASE_URL')
-        self.supabase_key = os.getenv('SUPABASE_ANON_KEY')
+        self.supabase_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY') or os.getenv('SUPABASE_ANON_KEY')
         
         if not self.supabase_url or not self.supabase_key:
-            raise ValueError("SUPABASE_URL and SUPABASE_ANON_KEY must be set in environment variables")
+            raise ValueError(
+                "SUPABASE_URL and either SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY must be set."
+            )
         
         try:
             # Create client without proxy settings to avoid compatibility issues
@@ -128,7 +130,9 @@ def get_supabase_manager():
         try:
             supabase_manager = SupabaseManager()
         except Exception as e:
+            if os.getenv('FLASK_ENV', 'development').lower() == 'production':
+                raise
             print(f"Failed to initialize Supabase, using mock manager: {e}")
             from .dev_config import get_mock_supabase_manager
             supabase_manager = get_mock_supabase_manager()
-    return supabase_manager 
+    return supabase_manager

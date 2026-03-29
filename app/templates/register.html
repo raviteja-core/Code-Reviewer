@@ -1,92 +1,168 @@
 {% extends 'base.html' %}
+{% block title %}CodeReviewer — Create Account{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="card fade-in">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <i class="fas fa-user-plus text-white fs-4"></i>
-                    </div>
-                    <h2 class="mb-2">Create Account</h2>
-                    <p class="text-muted">Join CodeReviewer to improve your coding skills</p>
-                </div>
-                
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">
-                            <i class="fas fa-user me-2"></i>Full Name
-                        </label>
-                        <input type="text" class="form-control" id="name" name="name" 
-                               placeholder="Enter your full name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">
-                            <i class="fas fa-envelope me-2"></i>Email address
-                        </label>
-                        <input type="email" class="form-control" id="email" name="email" 
-                               placeholder="Enter your email" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="password" class="form-label">
-                            <i class="fas fa-lock me-2"></i>Password
-                        </label>
-                        <input type="password" class="form-control" id="password" name="password" 
-                               placeholder="Create a strong password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 mb-3">
-                        <i class="fas fa-user-plus me-2"></i>Create Account
-                    </button>
-                </form>
-                
-                <div class="text-center">
-                    <p class="mb-0">
-                        Already have an account? 
-                        <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-semibold">
-                            Login here
-                        </a>
-                    </p>
-                </div>
-            </div>
+<section class="auth-layout fade-up">
+    <div class="auth-story section-panel">
+        <div class="eyebrow">Create your workspace</div>
+        <h1 class="page-title">Start using the product in a cleaner, sharper flow.</h1>
+        <p class="page-lead">Register once, then submit code, open reports, and keep a running review archive inside the same interface language as the landing page.</p>
+
+        <div class="auth-points">
+            <article class="product-card auth-point">
+                <div class="panel-label">Submission</div>
+                <p class="panel-copy">Paste code or upload a source file to begin a review.</p>
+            </article>
+            <article class="product-card auth-point">
+                <div class="panel-label">Feedback</div>
+                <p class="panel-copy">Receive structured AI analysis with readable report sections.</p>
+            </article>
+            <article class="product-card auth-point">
+                <div class="panel-label">History</div>
+                <p class="panel-copy">Keep your old reports organized and easy to revisit later.</p>
+            </article>
         </div>
     </div>
-</div>
+
+    <div class="auth-form-wrap">
+        <div class="section-panel auth-form-card">
+            <div class="auth-icon"><i class="fas fa-user-plus"></i></div>
+            <h2 class="auth-title">Create account</h2>
+            <p class="auth-copy">Set up your CodeReviewer workspace.</p>
+
+            <form method="POST" class="auth-form">
+                <div>
+                    <label for="name" class="form-heading">Full name</label>
+                    <input type="text" class="form-control input-surface" id="name" name="name" placeholder="John Doe" required>
+                </div>
+                <div>
+                    <label for="email" class="form-heading">Email address</label>
+                    <input type="email" class="form-control input-surface" id="email" name="email" placeholder="name@example.com" required>
+                </div>
+                <div>
+                    <label for="password" class="form-heading">Password</label>
+                    <input type="password" class="form-control input-surface" id="password" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-custom btn-primary-custom btn-xl auth-submit">Create Workspace</button>
+            </form>
+
+            <p class="auth-switch">Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
+        </div>
+    </div>
+</section>
 
 <style>
-.card {
-    border: none;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
+    .auth-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
+        gap: 20px;
+        align-items: stretch;
+        min-height: calc(100vh - 220px);
+    }
 
-.form-control {
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
-}
+    .auth-story,
+    .auth-form-card {
+        padding: 34px;
+    }
 
-.form-control:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
+    .auth-points {
+        display: grid;
+        gap: 16px;
+        margin-top: 28px;
+    }
 
-.btn-primary {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    border: none;
-    border-radius: 12px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
+    .auth-point {
+        padding: 20px 22px;
+    }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.3);
-}
+    .auth-form-wrap {
+        display: flex;
+    }
 
-.form-label {
-    font-weight: 500;
-    color: #374151;
-}
+    .auth-form-card {
+        width: 100%;
+        margin: auto 0;
+        text-align: center;
+    }
+
+    .auth-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 6px;
+        clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+        margin: 0 auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(249,115,22,.12);
+        border: 1px solid rgba(249,115,22,.18);
+        color: var(--orange);
+        font-size: 1.5rem;
+    }
+
+    .auth-title {
+        margin: 0 0 8px;
+        font-size: 2rem;
+    }
+
+    .auth-copy,
+    .auth-switch {
+        color: var(--text-muted);
+    }
+
+    .auth-form {
+        display: grid;
+        gap: 16px;
+        margin-top: 26px;
+        text-align: left;
+    }
+
+    .form-heading {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--text-dim);
+        font-weight: 700;
+        font-size: .92rem;
+    }
+
+    .input-surface {
+        background: rgba(255,255,255,.03) !important;
+        border: 1px solid rgba(255,255,255,.08) !important;
+        min-height: 56px;
+    }
+
+    .btn-xl {
+        padding: 14px 24px;
+        border-radius: 4px;
+    }
+
+    .auth-submit {
+        width: 100%;
+        justify-content: center;
+        margin-top: 6px;
+    }
+
+    .auth-switch {
+        margin: 20px 0 0;
+    }
+
+    .auth-switch a {
+        color: var(--orange);
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+        .auth-layout {
+            grid-template-columns: 1fr;
+            min-height: auto;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .auth-story,
+        .auth-form-card {
+            padding: 24px;
+        }
+    }
 </style>
-{% endblock %} 
+{% endblock %}

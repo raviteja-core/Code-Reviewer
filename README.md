@@ -1,12 +1,12 @@
 # Code Reviewer Project
 
-A Flask-based web application that provides AI-powered code review and analysis using Google's Gemini AI.
+A Flask-based web application that provides AI-powered code review and analysis using Groq AI.
 
 ## Features
 
 - User authentication and registration
 - Code submission and analysis
-- AI-powered code review with Gemini
+- AI-powered code review with Groq
 - Programming language detection
 - Code quality scoring
 - Plagiarism detection hints
@@ -16,8 +16,8 @@ A Flask-based web application that provides AI-powered code review and analysis 
 
 - **Backend**: Flask, Flask-Login
 - **Database**: Supabase (PostgreSQL)
-- **AI**: Google Gemini AI
-- **Deployment**: Vercel (Serverless)
+- **AI**: Groq AI (Model: openai/gpt-oss-120b)
+- **Deployment**: Render + Supabase
 - **Development**: Mock database for local testing
 
 ## Local Development
@@ -62,14 +62,14 @@ The application will be available at `http://localhost:5000`
 
 **Note**: For local development, the app uses a mock database. No external database setup is required.
 
-## Deployment to Vercel
+## Deployment to Render
 
 ### Prerequisites
 
-- Vercel account
+- Render account
 - GitHub repository with your code
 - Supabase account and project
-- Google Gemini API key
+- Groq API key
 
 ### Deployment Steps
 
@@ -78,22 +78,35 @@ The application will be available at `http://localhost:5000`
    - Run the SQL script from `supabase_setup.sql` in the SQL Editor
    - Get your project URL and anon key from Settings → API
 
-2. **Deploy to Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Click "New Project" → Import your Git repository
-   - Vercel will automatically detect the configuration
+2. **Deploy to Render**
+   - Push this repository to GitHub
+   - Go to [render.com](https://render.com)
+   - Click "New +" → "Blueprint"
+   - Select your GitHub repository
+   - Render will read `render.yaml` and create the web service
 
 3. **Configure Environment Variables**
-   In Vercel dashboard, add these variables:
+   In the Render dashboard, add these variables:
    ```
    SUPABASE_URL=your-supabase-project-url
+   SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
    SUPABASE_ANON_KEY=your-supabase-anon-key
-   GEMINI_API_KEY=your-gemini-api-key
+   GROQ_API_KEY=your-groq-api-key
    SECRET_KEY=your-secret-key
    FLASK_ENV=production
    ```
 
-For detailed deployment instructions, see `VERCEL_DEPLOYMENT.md`.
+   `SUPABASE_SERVICE_ROLE_KEY` is recommended for server-side inserts and reads.
+
+4. **Deploy**
+   - Save the environment variables
+   - Trigger the first deploy
+   - Once the build finishes, open the Render URL
+
+5. **Verify**
+   - Visit `/healthz` and confirm you get `{"status":"ok"}`
+   - Register a user
+   - Submit a sample code review and confirm data is stored in Supabase
 
 ### Environment Variables
 
@@ -102,8 +115,9 @@ For detailed deployment instructions, see `VERCEL_DEPLOYMENT.md`.
 | `SECRET_KEY` | Flask secret key for sessions | Yes |
 | `FLASK_ENV` | Environment (production/development) | Yes |
 | `SUPABASE_URL` | Supabase project URL | Yes (production) |
-| `SUPABASE_ANON_KEY` | Supabase anon/public key | Yes (production) |
-| `GEMINI_API_KEY` | Google Gemini API key | Yes |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase server-side key | Recommended |
+| `SUPABASE_ANON_KEY` | Supabase anon/public key | Optional fallback |
+| `GROQ_API_KEY` | Groq API key | Yes |
 
 ## Project Structure
 
@@ -128,7 +142,7 @@ codereviewer-project/
 │   └── config.py            # Configuration
 ├── supabase_setup.sql       # Database schema
 ├── requirements.txt         # Python dependencies
-├── vercel.json             # Vercel deployment config
+├── render.yaml             # Render deployment config
 └── run.py                  # Application entry point
 ```
 

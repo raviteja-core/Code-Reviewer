@@ -1,172 +1,949 @@
 {% extends 'base.html' %}
+{% block title %}CodeReviewer — Product Landing{% endblock %}
+{% block main_class %}home-shell{% endblock %}
 {% block content %}
-<div class="fade-in">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="text-center mb-5">
-                <div class="mb-4">
-                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="fas fa-code text-white" style="font-size: 2.5rem;"></i>
-                    </div>
-                </div>
-                <h1 class="display-4 mb-3 fw-bold">Welcome to CodeReviewer</h1>
-                <p class="lead mb-4 fs-5 text-muted">
-                    Get instant AI-powered code reviews and suggestions to improve your programming skills. 
-                    Perfect for students and beginners learning Python, JavaScript, and more.
-                </p>
-            </div>
-            
-            <div class="row mb-5 g-4">
-                <div class="col-md-4">
-                    <div class="card h-100 feature-card">
-                        <div class="card-body text-center p-4">
-                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                                <i class="fas fa-robot text-white fs-4"></i>
-                            </div>
-                            <h5 class="card-title mb-3">AI Analysis</h5>
-                            <p class="card-text text-muted">
-                                Get detailed feedback on code quality, formatting, and best practices from our advanced AI system.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 feature-card">
-                        <div class="card-body text-center p-4">
-                            <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                                <i class="fas fa-chart-line text-white fs-4"></i>
-                            </div>
-                            <h5 class="card-title mb-3">Code Scoring</h5>
-                            <p class="card-text text-muted">
-                                Receive a comprehensive score from 0-100 based on readability, structure, and best practices.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 feature-card">
-                        <div class="card-body text-center p-4">
-                            <div class="bg-info rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                                <i class="fas fa-comments text-white fs-4"></i>
-                            </div>
-                            <h5 class="card-title mb-3">Inline Comments</h5>
-                            <p class="card-text text-muted">
-                                AI-generated comments explain your code logic and functionality for better understanding.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row mb-5">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body p-4">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    <h4 class="mb-2">Ready to improve your coding skills?</h4>
-                                    <p class="text-muted mb-0">
-                                        Join thousands of developers who are already using CodeReviewer to enhance their programming abilities.
-                                    </p>
-                                </div>
-                                <div class="col-md-4 text-md-end">
-                                    {% if current_user.is_authenticated %}
-                                        <a href="{{ url_for('code.submit_code') }}" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-plus me-2"></i>Submit Code
-                                        </a>
-                                    {% else %}
-                                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-rocket me-2"></i>Get Started
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center">
-                <div class="d-flex gap-3 justify-content-center">
-                    {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('code.submit_code') }}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-plus me-2"></i>Submit Code
-                        </a>
-                        <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-primary btn-lg">
-                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                        </a>
-                    {% else %}
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-rocket me-2"></i>Get Started
-                        </a>
-                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg">
-                            <i class="fas fa-sign-in-alt me-2"></i>Login
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+<section class="hero-product" id="product-nav-cta">
+  <div class="hero-grid">
+    <div class="hero-copy fade-up">
+      <div class="hero-badge">AI-powered code review workspace</div>
+      <h1>Submit code, get structured feedback, and keep every review in one clean product flow.</h1>
+      <p class="hero-sub">CodeReviewer is built around the real project workflow: submit a snippet or file, receive AI analysis with a score, open the report, and return later through history.</p>
+
+      <div class="hero-actions">
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('code.submit_code') }}" class="btn-custom btn-primary-custom btn-large">Open Review Workspace</a>
+          <a href="{{ url_for('dashboard.dashboard') }}" class="btn-custom btn-ghost btn-large hero-secondary">View Dashboard</a>
+        {% else %}
+          <a href="{{ url_for('auth.register') }}" class="btn-custom btn-primary-custom btn-large">Start with CodeReviewer</a>
+          <a href="{{ url_for('auth.login') }}" class="btn-custom btn-ghost btn-large hero-secondary">Sign In</a>
+        {% endif %}
+      </div>
+
+      <div class="hero-signals">
+        <span>Code submission</span>
+        <span>AI feedback</span>
+        <span>Quality score</span>
+        <span>Saved reports</span>
+      </div>
     </div>
+
+    <div class="hero-visual fade-up" style="transition-delay:.12s">
+      <div class="hero-beam beam-left"></div>
+      <div class="hero-beam beam-right"></div>
+      <div class="hero-orb orb-main"></div>
+      <div class="hero-orb orb-side"></div>
+
+      <div class="visual-panel visual-panel-main float-slow">
+        <div class="scan-line"></div>
+        <div class="panel-top">
+          <span class="panel-pill">Submission analysis</span>
+          <span class="panel-status">Review complete</span>
+        </div>
+
+        <div class="diff-stack">
+          <div class="diff-line normal">
+            <div class="diff-mark neutral"></div>
+            <div class="diff-code">def calculate_total(items):</div>
+          </div>
+          <div class="diff-line remove">
+            <div class="diff-mark remove-mark"></div>
+            <div class="diff-code">total = 0</div>
+          </div>
+          <div class="diff-line add">
+            <div class="diff-mark add-mark"></div>
+            <div class="diff-code">total = sum(item["price"] for item in items)</div>
+          </div>
+          <div class="diff-line normal">
+            <div class="diff-mark neutral"></div>
+            <div class="diff-code">return round(total, 2)</div>
+          </div>
+        </div>
+
+        <div class="review-callout pulse-glow">
+          <div class="callout-head">
+            <div class="ai-avatar">CR</div>
+            <div>
+              <div class="callout-title">Readable logic feedback</div>
+              <div class="callout-meta">The report explains what to improve and why</div>
+            </div>
+          </div>
+          <p>The AI review turns a raw snippet into a cleaner report with quality guidance, clearer reasoning, and a result you can reopen later.</p>
+        </div>
+      </div>
+
+      <div class="visual-panel visual-panel-side side-left drift-card">
+        <div class="mini-label">Score</div>
+        <p>Each submission returns a quality score so the report feels measurable, not vague.</p>
+      </div>
+
+      <div class="visual-panel visual-panel-side side-right drift-card-delayed">
+        <div class="mini-label">History</div>
+        <p>Older reviews stay accessible through the archive so the workflow remains continuous.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span class="marquee-item">Paste code</span>
+    <span class="marquee-item">Upload a file</span>
+    <span class="marquee-item">Choose a language</span>
+    <span class="marquee-item">Generate a report</span>
+    <span class="marquee-item">Read AI feedback</span>
+    <span class="marquee-item">Check the score</span>
+    <span class="marquee-item">Open review history</span>
+    <span class="marquee-item">Paste code</span>
+    <span class="marquee-item">Upload a file</span>
+    <span class="marquee-item">Choose a language</span>
+    <span class="marquee-item">Generate a report</span>
+    <span class="marquee-item">Read AI feedback</span>
+    <span class="marquee-item">Check the score</span>
+    <span class="marquee-item">Open review history</span>
+  </div>
 </div>
 
+<section class="landing-section fade-up" id="workflow">
+  <div class="section-heading centered">
+    <div class="section-tag">// workflow</div>
+    <h2>The landing page now mirrors the actual product.</h2>
+    <p class="section-sub centered-sub">Every section below maps to a real part of CodeReviewer instead of generic marketing filler.</p>
+  </div>
+
+  <div class="symmetric-grid-3">
+    <article class="story-card fade-up story-hover">
+      <div class="story-kicker">Submit</div>
+      <h3>Start with a snippet or a file.</h3>
+      <p>Choose a language, paste your code, or upload a source file from the submit page.</p>
+    </article>
+
+    <article class="story-card fade-up story-hover" style="transition-delay:.08s">
+      <div class="story-kicker">Review</div>
+      <h3>Receive a structured AI report.</h3>
+      <p>The report screen combines analysis, score, formatting, and the full code preview into one place.</p>
+    </article>
+
+    <article class="story-card fade-up story-hover" style="transition-delay:.16s">
+      <div class="story-kicker">Return</div>
+      <h3>Keep every review easy to revisit.</h3>
+      <p>The dashboard and history pages keep previous submissions available without breaking the visual flow.</p>
+    </article>
+  </div>
+</section>
+
+<section class="landing-section fade-up" id="surfaces">
+  <div class="section-heading centered">
+    <div class="section-tag">// product surfaces</div>
+    <h2>A small project presented like a complete product.</h2>
+  </div>
+
+  <div class="symmetric-grid-2">
+    <article class="feature-card feature-card-large fade-up story-hover">
+      <div class="feature-icon icon-orange icon-grid">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <h3>Dashboard that feels connected</h3>
+      <p>The dashboard now shares the same spacing, card language, and typography as the landing page so it feels like one experience.</p>
+    </article>
+
+    <article class="feature-card feature-card-large fade-up story-hover" style="transition-delay:.08s">
+      <div class="feature-icon icon-blue icon-stack">
+        <span></span><span></span><span></span>
+      </div>
+      <h3>Report formatting that reads cleanly</h3>
+      <p>The feedback page is aligned and styled to make generated analysis easier to scan, with cleaner spacing around headings, lists, code, and notes.</p>
+    </article>
+
+    <article class="feature-card feature-card-large fade-up story-hover" style="transition-delay:.16s">
+      <div class="feature-icon icon-green icon-archive">
+        <span></span><span></span>
+      </div>
+      <h3>History that stays visually organized</h3>
+      <p>Past submissions, score chips, and open-report actions now live inside a more balanced archive layout.</p>
+    </article>
+
+    <article class="feature-card feature-card-large feature-card-dark fade-up story-hover" style="transition-delay:.24s">
+      <div class="feature-icon icon-orange icon-motion">
+        <span></span><span></span><span></span>
+      </div>
+      <h3>Custom cursor and richer motion</h3>
+      <p>Subtle animation layers, floating panels, sweeping beams, and a custom cursor help the product feel more intentional without hiding the real features.</p>
+    </article>
+  </div>
+</section>
+
 <style>
-.feature-card {
-    transition: all 0.3s ease;
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
+  .hero-product {
+    position: relative;
+    padding: 56px 0 64px;
+  }
 
-.feature-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
+  .hero-product::before,
+  .hero-product::after {
+    content: '';
+    position: absolute;
+    border-radius: 0;
+    filter: blur(24px);
+    pointer-events: none;
+  }
 
-.display-4 {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
+  .hero-product::before {
+    inset: 8% auto auto 4%;
+    width: 250px;
+    height: 250px;
+    background: rgba(249,115,22,.12);
+  }
 
-.card {
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
+  .hero-product::after {
+    inset: auto 6% 10% auto;
+    width: 260px;
+    height: 260px;
+    background: rgba(34,211,238,.08);
+  }
 
-.card:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
+  .hero-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 40px;
+    align-items: center;
+    min-height: calc(100vh - 160px);
+    position: relative;
+  }
 
-.btn-lg {
-    padding: 0.75rem 2rem;
-    font-weight: 600;
-    border-radius: 12px;
-}
+  .hero-copy {
+    max-width: 700px;
+    animation: heroSettled .9s cubic-bezier(.16,1,.3,1) forwards;
+  }
 
-.btn-primary {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    border: none;
-    transition: all 0.3s ease;
-}
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 3px;
+    border: 1px solid rgba(249,115,22,.35);
+    background: rgba(249,115,22,.10);
+    color: #ffd7bc;
+    font-size: .82rem;
+    letter-spacing: .02em;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 24px;
+    box-shadow: 0 0 30px rgba(249,115,22,.12);
+  }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.3);
-}
+  .hero-copy h1 {
+    font-size: clamp(2.85rem, 4.9vw, 5.1rem);
+    line-height: .96;
+    letter-spacing: -0.05em;
+    margin: 0 0 20px;
+    text-wrap: balance;
+  }
 
-.btn-outline-primary {
-    border: 2px solid #6366f1;
-    color: #6366f1;
-    transition: all 0.3s ease;
-}
+  .hero-sub {
+    max-width: 600px;
+    font-size: 1.12rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+    margin: 0 0 32px;
+  }
 
-.btn-outline-primary:hover {
-    background: #6366f1;
-    border-color: #6366f1;
-    transform: translateY(-2px);
-}
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+    animation: riseStagger .8s cubic-bezier(.16,1,.3,1) forwards;
+    animation-delay: .12s;
+    opacity: 0;
+  }
+
+  .btn-large {
+    padding: 15px 30px;
+    border-radius: 4px;
+    font-size: .98rem;
+  }
+
+  .hero-secondary {
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.03);
+  }
+
+  .hero-signals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    animation: riseStagger .8s cubic-bezier(.16,1,.3,1) forwards;
+    animation-delay: .22s;
+    opacity: 0;
+  }
+
+  .hero-signals span {
+    padding: 10px 14px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.035);
+    color: var(--text-dim);
+    font-size: .84rem;
+    letter-spacing: .02em;
+  }
+
+  .hero-visual {
+    position: relative;
+    min-height: 720px;
+    animation: heroVisualReveal 1s cubic-bezier(.16,1,.3,1) forwards;
+  }
+
+  .hero-beam,
+  .hero-orb {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .hero-beam {
+    width: 220px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(249,115,22,.6), transparent);
+    opacity: .7;
+    animation: sweepBeam 7s ease-in-out infinite;
+  }
+
+  .beam-left {
+    left: 2%;
+    top: 24%;
+    transform: rotate(-18deg);
+  }
+
+  .beam-right {
+    right: 0;
+    bottom: 24%;
+    transform: rotate(14deg);
+    animation-delay: -3s;
+  }
+
+  .hero-orb {
+    border-radius: 0;
+    filter: blur(18px);
+    opacity: .9;
+    animation: orbitGlow 7.5s ease-in-out infinite;
+  }
+
+  .orb-main {
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(249,115,22,.28), transparent 68%);
+    top: 8%;
+    right: 8%;
+  }
+
+  .orb-side {
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(96,165,250,.22), transparent 70%);
+    bottom: 10%;
+    left: 4%;
+    animation-delay: -4s;
+  }
+
+  .visual-panel {
+    position: absolute;
+    background: linear-gradient(180deg, rgba(20,24,33,.96), rgba(10,13,19,.96));
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 6px;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 28px 80px rgba(0,0,0,.42);
+    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+  }
+
+  .visual-panel-main {
+    inset: 8% 6% 18% 6%;
+    padding: 24px;
+    overflow: hidden;
+  }
+
+  .scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(249,115,22,.7), transparent);
+    animation: scanLine 5.8s linear infinite;
+    opacity: .75;
+    z-index: 2;
+  }
+
+  .visual-panel-main::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(120deg, rgba(249,115,22,.08), transparent 30%),
+      linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+    background-size: 100% 100%, 34px 34px, 34px 34px;
+    mask-image: linear-gradient(180deg, rgba(0,0,0,1), rgba(0,0,0,.75));
+  }
+
+  .panel-top,
+  .callout-head {
+    display: flex;
+    align-items: center;
+  }
+
+  .panel-top {
+    position: relative;
+    z-index: 1;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 26px;
+  }
+
+  .panel-pill,
+  .panel-status,
+  .mini-label,
+  .story-kicker,
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .panel-pill,
+  .panel-status {
+    padding: 8px 12px;
+    border-radius: 3px;
+    font-size: .76rem;
+    letter-spacing: .03em;
+  }
+
+  .panel-pill {
+    background: rgba(255,255,255,.05);
+    color: var(--text-dim);
+  }
+
+  .panel-status {
+    background: rgba(52,211,153,.12);
+    border: 1px solid rgba(52,211,153,.24);
+    color: #9ef7cd;
+  }
+
+  .diff-stack {
+    position: relative;
+    z-index: 1;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(6,8,12,.65);
+  }
+
+  .diff-line {
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem;
+    border-top: 1px solid rgba(255,255,255,.05);
+  }
+
+  .diff-line:first-child {
+    border-top: none;
+  }
+
+  .diff-mark {
+    width: 10px;
+    height: 10px;
+    border-radius: 0;
+    margin-top: 4px;
+    box-shadow: 0 0 12px currentColor;
+  }
+
+  .neutral {
+    color: rgba(255,255,255,.45);
+    background: rgba(255,255,255,.35);
+  }
+
+  .remove-mark {
+    color: var(--red);
+    background: var(--red);
+  }
+
+  .add-mark {
+    color: var(--green);
+    background: var(--green);
+  }
+
+  .diff-code {
+    color: var(--text-dim);
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+
+  .diff-line.remove {
+    background: rgba(251,113,133,.08);
+  }
+
+  .diff-line.add {
+    background: rgba(52,211,153,.09);
+  }
+
+  .review-callout {
+    position: relative;
+    z-index: 1;
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 6px;
+    border: 1px solid rgba(249,115,22,.22);
+    background: linear-gradient(180deg, rgba(249,115,22,.11), rgba(249,115,22,.05));
+  }
+
+  .callout-head {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .ai-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--orange), #fb923c);
+    color: #111;
+    font-size: .74rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .callout-title {
+    color: var(--text);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .callout-meta,
+  .mini-label,
+  .story-kicker {
+    color: #f9b78b;
+    font-size: .76rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .review-callout p,
+  .visual-panel-side p,
+  .story-card p,
+  .feature-card p {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .visual-panel-side {
+    width: 240px;
+    padding: 18px 18px 20px;
+  }
+
+  .side-left {
+    left: 0;
+    top: 14%;
+  }
+
+  .side-right {
+    right: 0;
+    bottom: 10%;
+  }
+
+  .marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+    background: rgba(12,16,22,.7);
+    margin: 4px 0 42px;
+  }
+
+  .marquee {
+    display: flex;
+    gap: 48px;
+    width: max-content;
+    white-space: nowrap;
+    animation: marquee 26s linear infinite;
+  }
+
+  .marquee-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem;
+    letter-spacing: .02em;
+  }
+
+  .marquee-item::before {
+    content: '';
+    width: 9px;
+    height: 9px;
+    display: inline-block;
+    background: var(--orange);
+    box-shadow: 0 0 14px rgba(249,115,22,.3);
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  }
+
+  .landing-section {
+    padding: 56px 0 18px;
+  }
+
+  .section-heading {
+    max-width: 860px;
+    margin: 0 0 30px;
+  }
+
+  .centered {
+    margin: 0 auto 30px;
+    text-align: center;
+  }
+
+  .centered-sub {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .section-tag {
+    display: inline-block;
+    color: var(--orange);
+    font-size: .76rem;
+    letter-spacing: .08em;
+    margin-bottom: 14px;
+  }
+
+  h2 {
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    line-height: 1.04;
+    letter-spacing: -0.04em;
+    margin-bottom: 16px;
+    text-wrap: balance;
+  }
+
+  .section-sub {
+    max-width: 700px;
+    color: var(--text-muted);
+    font-size: 1.02rem;
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .story-card,
+  .feature-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 6px;
+    background: linear-gradient(180deg, rgba(15,18,25,.96), rgba(9,12,17,.96));
+    padding: 28px;
+    min-height: 100%;
+    transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease;
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  }
+
+  .story-card::before,
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(140deg, rgba(255,255,255,.05), transparent 38%);
+    opacity: .5;
+    pointer-events: none;
+  }
+
+  .story-card h3,
+  .feature-card h3 {
+    font-size: 1.42rem;
+    line-height: 1.2;
+    margin: 12px 0 12px;
+  }
+
+  .feature-card-large {
+    min-height: 230px;
+  }
+
+  .story-hover:hover {
+    transform: translateY(-6px);
+    border-color: rgba(249,115,22,.16);
+    box-shadow: 0 24px 64px rgba(0,0,0,.22);
+  }
+
+  .feature-card-dark {
+    background: linear-gradient(180deg, rgba(8,11,16,.96), rgba(11,13,18,.96));
+  }
+
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    border: 1px solid rgba(255,255,255,.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-icon::after {
+    content: '';
+    position: absolute;
+    inset: -30% auto -30% -55%;
+    width: 55%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.26), transparent);
+    transform: skewX(-18deg);
+    animation: iconSweep 3.6s ease-in-out infinite;
+  }
+
+  .icon-orange {
+    background: rgba(249,115,22,.14);
+    color: #ffd6b7;
+  }
+
+  .icon-green {
+    background: rgba(52,211,153,.14);
+    color: #beffe0;
+  }
+
+  .icon-blue {
+    background: rgba(96,165,250,.14);
+    color: #cfe5ff;
+  }
+
+  .feature-icon span {
+    position: absolute;
+    display: block;
+    background: currentColor;
+    opacity: .95;
+    animation: iconPulse 2.8s ease-in-out infinite;
+  }
+
+  .icon-grid span {
+    width: 10px;
+    height: 10px;
+  }
+
+  .icon-grid span:nth-child(1) { top: 10px; left: 10px; }
+  .icon-grid span:nth-child(2) { top: 10px; right: 10px; animation-delay: -.2s; }
+  .icon-grid span:nth-child(3) { bottom: 10px; left: 10px; animation-delay: -.4s; }
+  .icon-grid span:nth-child(4) { bottom: 10px; right: 10px; animation-delay: -.6s; }
+
+  .icon-stack span {
+    left: 10px;
+    right: 10px;
+    height: 4px;
+  }
+
+  .icon-stack span:nth-child(1) { top: 12px; }
+  .icon-stack span:nth-child(2) { top: 22px; animation-delay: -.18s; }
+  .icon-stack span:nth-child(3) { top: 32px; animation-delay: -.36s; }
+
+  .icon-archive span:nth-child(1) {
+    inset: 12px 10px 18px 10px;
+    border: 2px solid currentColor;
+    background: transparent;
+  }
+
+  .icon-archive span:nth-child(2) {
+    left: 14px;
+    right: 14px;
+    top: 18px;
+    height: 4px;
+    animation-delay: -.22s;
+  }
+
+  .icon-motion span:nth-child(1) {
+    width: 24px;
+    height: 2px;
+    left: 8px;
+    top: 14px;
+  }
+
+  .icon-motion span:nth-child(2) {
+    width: 30px;
+    height: 2px;
+    left: 8px;
+    top: 24px;
+    animation-delay: -.18s;
+  }
+
+  .icon-motion span:nth-child(3) {
+    width: 20px;
+    height: 2px;
+    left: 8px;
+    top: 34px;
+    animation-delay: -.36s;
+  }
+
+  .float-slow {
+    animation: floatSlow 4.4s ease-in-out infinite;
+  }
+
+  .pulse-glow {
+    animation: pulseGlow 2.4s ease-in-out infinite;
+  }
+
+  .drift-card {
+    animation: driftCard 4.8s ease-in-out infinite;
+  }
+
+  .drift-card-delayed {
+    animation: driftCard 5.2s ease-in-out infinite;
+    animation-delay: -1.4s;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes orbitGlow {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: .65; }
+    50% { transform: translate3d(0, -24px, 0) scale(1.12) rotate(8deg); opacity: 1; }
+  }
+
+  @keyframes floatSlow {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-18px) rotate(.4deg); }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 rgba(249,115,22,0), 0 12px 44px rgba(249,115,22,.08); transform: translateY(0); }
+    50% { box-shadow: 0 0 36px rgba(249,115,22,.16), 0 20px 60px rgba(249,115,22,.18); transform: translateY(-4px); }
+  }
+
+  @keyframes driftCard {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-14px) translateX(4px); }
+  }
+
+  @keyframes iconPulse {
+    0%, 100% { opacity: .62; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+
+  @keyframes iconSweep {
+    0%, 100% { transform: translateX(0) skewX(-18deg); opacity: 0; }
+    35% { opacity: .9; }
+    60% { transform: translateX(180%) skewX(-18deg); opacity: .9; }
+    100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
+  }
+
+  @keyframes sweepBeam {
+    0%, 100% { opacity: .18; transform: translateX(0) scaleX(1); }
+    50% { opacity: 1; transform: translateX(34px) scaleX(1.35); }
+  }
+
+  @keyframes heroSettled {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes riseStagger {
+    from { opacity: 0; transform: translateY(28px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes heroVisualReveal {
+    from { opacity: 0; transform: translateY(34px) scale(.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes scanLine {
+    0% { transform: translateY(0); opacity: .9; }
+    100% { transform: translateY(460px); opacity: .15; }
+  }
+
+  @media (max-width: 1200px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-visual {
+      min-height: 760px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .hero-product {
+      padding-top: 24px;
+    }
+
+    .hero-grid {
+      gap: 28px;
+      min-height: auto;
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(2.7rem, 10vw, 4.4rem);
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+    }
+
+    .hero-visual {
+      min-height: 680px;
+    }
+
+    .visual-panel-main {
+      inset: 12% 0 26% 0;
+      padding: 18px;
+    }
+
+    .visual-panel-side {
+      width: 210px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-actions,
+    .hero-signals {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .hero-actions .btn-custom,
+    .hero-signals span {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .hero-visual {
+      min-height: 620px;
+    }
+
+    .visual-panel-main {
+      inset: 10% 0 30% 0;
+    }
+
+    .visual-panel-side {
+      position: relative;
+      width: 100%;
+      left: auto;
+      right: auto;
+      top: auto;
+      bottom: auto;
+      margin-top: 14px;
+    }
+
+    .panel-top {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .diff-line {
+      grid-template-columns: 18px minmax(0, 1fr);
+      gap: 12px;
+      padding: 12px 14px;
+    }
+  }
 </style>
-{% endblock %} 
+{% endblock %}

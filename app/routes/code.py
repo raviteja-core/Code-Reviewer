@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from ..models import CodeSubmission
-from ..utils.ai_utils import analyze_code_with_gemini
+from ..utils.ai_utils import analyze_code_with_groq
 from ..supabase_config import get_supabase_manager
 import os
 
@@ -20,7 +20,7 @@ def submit_code():
         
         # Analyze code with Gemini API
         try:
-            feedback, score, comments = analyze_code_with_gemini(code_text, language)
+            feedback, score, comments = analyze_code_with_groq(code_text, language)
             
             # Get detected language for storage
             from ..utils.ai_utils import detect_language

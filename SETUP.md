@@ -24,7 +24,7 @@ SUPABASE_URL=https://your-project-id.supabase.co
 SUPABASE_ANON_KEY=your-supabase-anon-key-here
 
 # API Keys
-GEMINI_API_KEY=your-gemini-api-key-here
+GROQ_API_KEY=your-groq-api-key-here
 ```
 
 **Note**: For local development, you can run the app without Supabase credentials. It will use a mock database that stores data in memory.
@@ -46,19 +46,20 @@ The application will be available at `http://localhost:5000`
 3. Go to the SQL Editor and run the contents of `supabase_setup.sql`
 4. Get your project URL and anon key from Settings → API
 
-### 2. Deploy to Vercel
+### 2. Deploy to Render
 
 1. Push your code to a Git repository
-2. Go to [vercel.com](https://vercel.com) and create a new project
+2. Go to [render.com](https://render.com) and create a new Blueprint service
 3. Import your Git repository
 4. Add the following environment variables:
    - `SUPABASE_URL`: Your Supabase project URL
+   - `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase service role key
    - `SUPABASE_ANON_KEY`: Your Supabase anon key
-   - `GEMINI_API_KEY`: Your Gemini API key
+   - `GROQ_API_KEY`: Your Groq API key
    - `SECRET_KEY`: A secure random string for sessions
    - `FLASK_ENV`: Set to "production"
 
-For detailed Vercel deployment instructions, see `VERCEL_DEPLOYMENT.md`.
+5. Deploy and verify `https://your-service.onrender.com/healthz`
 
 ## Features
 
@@ -83,14 +84,14 @@ For detailed Vercel deployment instructions, see `VERCEL_DEPLOYMENT.md`.
    - Check your `SUPABASE_URL` and `SUPABASE_ANON_KEY`
    - Ensure your Supabase project is active
 
-3. **Gemini API errors**
-   - Verify your `GEMINI_API_KEY` is correct
+3. **Groq API errors**
+   - Verify your `GROQ_API_KEY` is correct
    - Check your API quota
 
 ### Getting API Keys
 
-1. **Gemini API Key**:
-   - Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+1. **Groq API Key**:
+   - Go to [Groq Console](https://console.groq.com/keys)
    - Create a new API key
 
 2. **Supabase Credentials**:
@@ -103,7 +104,7 @@ For detailed Vercel deployment instructions, see `VERCEL_DEPLOYMENT.md`.
 ```
 codereviewer/
 ├── api/
-│   ├── index.py           # Vercel serverless function
+│   ├── index.py           # Alternate serverless entrypoint
 │   └── requirements.txt   # Python dependencies for API
 ├── app/
 │   ├── __init__.py          # Flask app initialization
@@ -117,6 +118,6 @@ codereviewer/
 │   └── config.py            # Configuration settings
 ├── supabase_setup.sql       # Database schema
 ├── requirements.txt         # Python dependencies
-├── vercel.json             # Vercel deployment config
+├── render.yaml             # Render deployment config
 └── run.py                  # Application entry point
-``` 
+```

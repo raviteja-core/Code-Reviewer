@@ -1,10 +1,9 @@
 import os
 import json
 import time
-from google import genai
+from groq import Groq
 import markdown2
 from typing import Tuple
-from google.api_core import exceptions as google_exceptions
 
 def detect_language(code_text: str) -> str:
     """
@@ -95,9 +94,9 @@ def detect_language(code_text: str) -> str:
     
     return 'unknown'
 
-def analyze_code_with_gemini(code_text: str, language: str, max_retries: int = 3):
+def analyze_code_with_groq(code_text: str, language: str, max_retries: int = 3):
     """
-    Analyze code with Gemini AI with retry logic for handling API errors.
+    Analyze code with Groq AI with retry logic for handling API errors.
     """
     # First, detect the actual language of the code
     detected_language = detect_language(code_text)
@@ -114,11 +113,11 @@ def analyze_code_with_gemini(code_text: str, language: str, max_retries: int = 3
     else:
         analysis_language = language
     
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
-        raise Exception("GEMINI_API_KEY not found in environment variables")
+        raise Exception("GROQ_API_KEY not found in environment variables")
     
-    client = genai.Client(api_key=api_key)
+    client = Groq(api_key=api_key)
     prompt = f"""
     Analyze the following {analysis_language} code and provide a structured review with the following format:
 
@@ -176,11 +175,25 @@ def analyze_code_with_gemini(code_text: str, language: str, max_retries: int = 3
     
     for attempt in range(max_retries):
         try:
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
+            completion = client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=[
+                  {
+                    "role": "user",
+                    "content": prompt
+                  }
+                ],
+                temperature=1,
+                max_completion_tokens=8192,
+                top_p=1,
+                reasoning_effort="medium",
+                stream=True,
+                stop=None
             )
-            content = response.text
+
+            content = ""
+            for chunk in completion:
+                content += chunk.choices[0].delta.content or ""
             
             # Parse the response for FEEDBACK, SCORE, COMMENTS
             feedback, score, comments = '', 50, ''
@@ -211,27 +224,24 @@ def analyze_code_with_gemini(code_text: str, language: str, max_retries: int = 3
             feedback_html = markdown2.markdown(feedback)
             return feedback_html, score, comments
             
-        except google_exceptions.ServiceUnavailable as e:
-            if attempt < max_retries - 1:
-                wait_time = (2 ** attempt) + 1  # Exponential backoff: 1s, 3s, 7s
-                time.sleep(wait_time)
-                continue
+        except Exception as e:
+            if "quota" in str(e).lower() or "limit" in str(e).lower():
+                raise Exception("Groq AI service quota exceeded. Please try again later or contact support.")
+            elif "401" in str(e) or "unauthorized" in str(e).lower() or "api key" in str(e).lower():
+                raise Exception("Access denied to Groq AI. Please check your API key and permissions.")
+            elif "503" in str(e) or "unavailable" in str(e).lower() or "overloaded" in str(e).lower():
+                if attempt < max_retries - 1:
+                    wait_time = (2 ** attempt) + 1
+                    time.sleep(wait_time)
+                    continue
+                else:
+                    feedback, score, comments = basic_code_analysis(code_text, analysis_language)
+                    if language_mismatch:
+                        feedback = f"{language_warning}\n\n{feedback}"
+                    feedback_html = markdown2.markdown(feedback)
+                    return feedback_html, score, comments
             else:
-                # Use fallback analysis when AI service is unavailable
-                feedback, score, comments = basic_code_analysis(code_text, analysis_language)
-                if language_mismatch:
-                    feedback = f"{language_warning}\n\n{feedback}"
-                feedback_html = markdown2.markdown(feedback)
-                return feedback_html, score, comments
-                
-        except google_exceptions.ResourceExhausted as e:
-            raise Exception("Gemini AI service quota exceeded. Please try again later or contact support.")
-            
-        except google_exceptions.InvalidArgument as e:
-            raise Exception(f"Invalid request to Gemini AI: {str(e)}")
-            
-        except google_exceptions.PermissionDenied as e:
-            raise Exception("Access denied to Gemini AI. Please check your API key and permissions.")
+                raise Exception(f"Unexpected error occurred: {str(e)}")
             
         except Exception as e:
             if "503" in str(e) or "UNAVAILABLE" in str(e):
@@ -425,11 +435,11 @@ def generate_inline_comments(code_text: str, language: str, max_retries: int = 3
     """
     Generate inline comments for code using Google Gemini AI with retry logic.
     """
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         return "Comments could not be generated - API key not available"
     
-    client = genai.Client(api_key=api_key)
+    client = Groq(api_key=api_key)
     prompt = f"""
     Add helpful inline comments to this {language} code. 
     Explain what each section does in simple terms.
@@ -440,36 +450,36 @@ def generate_inline_comments(code_text: str, language: str, max_retries: int = 3
     
     for attempt in range(max_retries):
         try:
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
+            completion = client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=[
+                  {
+                    "role": "user",
+                    "content": prompt
+                  }
+                ],
+                temperature=1,
+                max_completion_tokens=8192,
+                top_p=1,
+                reasoning_effort="medium",
+                stream=True,
+                stop=None
             )
-            return response.text
             
-        except google_exceptions.ServiceUnavailable as e:
-            if attempt < max_retries - 1:
-                wait_time = (2 ** attempt) + 1
-                time.sleep(wait_time)
-                continue
-            else:
-                return f"Comments could not be generated - Gemini AI service is currently unavailable. Please try again in a few minutes. (Attempt {attempt + 1}/{max_retries})"
-                
-        except google_exceptions.ResourceExhausted as e:
-            return "Comments could not be generated - Gemini AI service quota exceeded. Please try again later."
-            
-        except google_exceptions.InvalidArgument as e:
-            return f"Comments could not be generated - Invalid request: {str(e)}"
-            
-        except google_exceptions.PermissionDenied as e:
-            return "Comments could not be generated - Access denied. Please check your API key and permissions."
+            content = ""
+            for chunk in completion:
+                content += chunk.choices[0].delta.content or ""
+            return content
             
         except Exception as e:
-            if "503" in str(e) or "UNAVAILABLE" in str(e):
+            if "503" in str(e) or "unavailable" in str(e).lower() or "overloaded" in str(e).lower():
                 if attempt < max_retries - 1:
                     wait_time = (2 ** attempt) + 1
                     time.sleep(wait_time)
                     continue
                 else:
-                    return f"Comments could not be generated - Gemini AI service is currently overloaded. Please try again in a few minutes. (Attempt {attempt + 1}/{max_retries})"
+                    return f"Comments could not be generated - Groq AI service is currently unavailable. Please try again in a few minutes. (Attempt {attempt + 1}/{max_retries})"
+            elif "quota" in str(e).lower() or "limit" in str(e).lower():
+                return "Comments could not be generated - Groq AI service quota exceeded. Please try again later."
             else:
                 return f"Comments could not be generated - Unexpected error: {str(e)}" 

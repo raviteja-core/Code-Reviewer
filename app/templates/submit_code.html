@@ -1,258 +1,343 @@
 {% extends 'base.html' %}
+{% block title %}CodeReviewer — Submit Code{% endblock %}
 {% block content %}
-<div class="fade-in">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex align-items-center mb-3">
-                <div class="bg-primary rounded-circle p-3 me-3">
-                    <i class="fas fa-code text-white fs-4"></i>
-                </div>
-                <div>
-                    <h2 class="mb-1">Submit Code for Review</h2>
-                    <p class="text-muted mb-0">
-                        <i class="fas fa-robot me-1"></i>Get AI-powered feedback on your code
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <form method="POST" enctype="multipart/form-data">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card mb-4">
-                    <div class="card-header d-flex align-items-center">
-                        <i class="fas fa-edit me-2 text-primary"></i>
-                        <h5 class="mb-0">Code Details</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <label for="language" class="form-label">
-                                <i class="fas fa-language me-2"></i>Programming Language
-                            </label>
-                            <select class="form-select" id="language" name="language" required>
-                                <option value="python">🐍 Python</option>
-                                <option value="javascript">🟨 JavaScript</option>
-                                <option value="java">☕ Java</option>
-                                <option value="cpp">⚡ C++</option>
-                                <option value="csharp">💎 C#</option>
-                                <option value="php">🐘 PHP</option>
-                                <option value="ruby">💎 Ruby</option>
-                                <option value="go">🐹 Go</option>
-                                <option value="rust">🦀 Rust</option>
-                                <option value="swift">🍎 Swift</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="code_text" class="form-label">
-                                <i class="fas fa-code me-2"></i>Code
-                            </label>
-                            <textarea class="form-control code-textarea" id="code_text" name="code_text" rows="15" 
-                                      placeholder="Paste your code here..." required></textarea>
-                            <div class="form-text mt-2">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Write clean, well-commented code for better feedback
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="file_upload" class="form-label">
-                                <i class="fas fa-upload me-2"></i>Or upload a file
-                            </label>
-                            <input type="file" class="form-control" id="file_upload" name="file_upload" 
-                                   accept=".py,.js,.java,.cpp,.cs,.php,.rb,.go,.rs,.swift,.txt">
-                            <div class="form-text mt-2">
-                                <i class="fas fa-file-code me-1"></i>
-                                Supported formats: .py, .js, .java, .cpp, .cs, .php, .rb, .go, .rs, .swift, .txt
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex gap-3">
-                            <button type="submit" class="btn btn-primary btn-lg flex-fill">
-                                <i class="fas fa-paper-plane me-2"></i>Submit for Review
-                            </button>
-                            <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-secondary btn-lg">
-                                <i class="fas fa-times me-2"></i>Cancel
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-4">
-                <div class="card mb-4">
-                    <div class="card-header d-flex align-items-center">
-                        <i class="fas fa-eye me-2 text-primary"></i>
-                        <h5 class="mb-0">Live Preview</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="preview-container">
-                            <pre class="mb-0"><code id="preview" class="hljs"></code></pre>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header d-flex align-items-center">
-                        <i class="fas fa-lightbulb me-2 text-primary"></i>
-                        <h5 class="mb-0">Tips for Better Reviews</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="tip-item mb-3">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <small>Include clear comments explaining your logic</small>
-                        </div>
-                        <div class="tip-item mb-3">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <small>Use meaningful variable and function names</small>
-                        </div>
-                        <div class="tip-item mb-3">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <small>Follow language-specific conventions</small>
-                        </div>
-                        <div class="tip-item">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <small>Keep functions focused and concise</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
+<section class="fade-up">
+    <div class="submit-shell">
+        <div class="submit-main section-panel">
+            <div class="eyebrow">Submit for analysis</div>
+            <h1 class="page-title">Paste code, upload a file, and generate a review.</h1>
+            <p class="page-lead">This page is the core of the product. Choose a language, add your source, and let CodeReviewer create a structured report you can revisit later.</p>
 
-<!-- Highlight.js for syntax highlighting -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+            <form method="POST" enctype="multipart/form-data" class="submit-form" id="submitReviewForm">
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="language" class="form-heading">Language</label>
+                        <select class="form-select input-surface" id="language" name="language" required>
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                            <option value="csharp">C#</option>
+                            <option value="php">PHP</option>
+                            <option value="ruby">Ruby</option>
+                            <option value="go">Go</option>
+                            <option value="rust">Rust</option>
+                            <option value="swift">Swift</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="file_upload" class="form-heading">Optional file</label>
+                        <input type="file" class="form-control input-surface file-input" id="file_upload" name="file_upload"
+                               accept=".py,.js,.java,.cpp,.cs,.php,.rb,.go,.rs,.swift,.txt">
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="code_text" class="form-heading">Source code</label>
+                    <div class="editor-shell">
+                        <div class="editor-topbar">
+                            <span class="editor-pill">Live input</span>
+                            <span class="editor-hint">The preview updates as you type</span>
+                        </div>
+                        <textarea class="form-control code-textarea" id="code_text" name="code_text" rows="18"
+                                  placeholder="// Paste your source here..." required></textarea>
+                    </div>
+                </div>
+
+                <div class="submit-actions">
+                    <button type="submit" class="btn-custom btn-primary-custom btn-xl" id="generateReviewButton">
+                        <span class="button-label">Generate Review</span>
+                    </button>
+                    <a href="{{ url_for('dashboard.dashboard') }}" class="btn-custom btn-ghost btn-xl submit-secondary">Back to Dashboard</a>
+                </div>
+
+                <div class="submit-processing" id="submitProcessingState" aria-live="polite" hidden>
+                    <div class="processing-spinner" aria-hidden="true"></div>
+                    <div>
+                        <p class="processing-title">Generating your review...</p>
+                        <p class="processing-copy">The AI is analyzing your code now. This can take a few moments, so please keep this page open.</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <aside class="submit-side">
+            <section class="product-card preview-card">
+                <div class="panel-label">Live preview</div>
+                <h2 class="panel-title">See the code surface before submitting</h2>
+                <div class="preview-container">
+                    <pre class="mb-0 overflow-hidden"><code id="preview" class="hljs font-mono"></code></pre>
+                </div>
+            </section>
+
+            <section class="product-card submit-tips">
+                <div class="panel-label">Best results</div>
+                <h2 class="panel-title">What makes a strong review input</h2>
+                <ul class="list-clean">
+                    <li>Paste a focused snippet or function instead of unrelated code.</li>
+                    <li>Upload a real file when you want the original formatting preserved.</li>
+                    <li>Use history after submission to compare review quality over time.</li>
+                </ul>
+            </section>
+        </aside>
+    </div>
+</section>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/tokyo-night-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/java.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
 
 <style>
-.code-textarea {
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: 14px;
-    line-height: 1.5;
-    background-color: #f8fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 1rem;
-    resize: vertical;
-}
+    .submit-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+        gap: 20px;
+        align-items: start;
+    }
 
-.code-textarea:focus {
-    background-color: white;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
+    .submit-main {
+        padding: 34px;
+    }
 
-.preview-container {
-    background-color: #f8fafc;
-    border-radius: 8px;
-    padding: 1rem;
-    max-height: 400px;
-    overflow-y: auto;
-}
+    .submit-form {
+        margin-top: 30px;
+    }
 
-.preview-container pre {
-    margin: 0;
-    font-size: 12px;
-    line-height: 1.4;
-}
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-bottom: 18px;
+    }
 
-.tip-item {
-    transition: all 0.3s ease;
-    padding: 0.5rem;
-    border-radius: 8px;
-}
+    .form-field {
+        margin-bottom: 18px;
+    }
 
-.tip-item:hover {
-    background-color: rgba(99, 102, 241, 0.05);
-    transform: translateX(4px);
-}
+    .form-heading {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--text-dim);
+        font-weight: 700;
+        font-size: .92rem;
+    }
 
-.form-select {
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
-}
+    .input-surface {
+        background: rgba(255,255,255,.03) !important;
+        border: 1px solid rgba(255,255,255,.08) !important;
+        min-height: 56px;
+    }
 
-.form-select:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
+    .file-input {
+        padding-top: 14px !important;
+    }
 
-/* Custom scrollbar for preview */
-.preview-container::-webkit-scrollbar {
-    width: 6px;
-}
+    .editor-shell {
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 6px;
+        clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+        overflow: hidden;
+        background: rgba(10,12,18,.92);
+    }
 
-.preview-container::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 3px;
-}
+    .editor-topbar {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 18px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        background: rgba(255,255,255,.02);
+        flex-wrap: wrap;
+    }
 
-.preview-container::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 3px;
-}
+    .editor-pill {
+        color: var(--orange);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .74rem;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
 
-.preview-container::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
+    .editor-hint {
+        color: var(--text-muted);
+        font-size: .88rem;
+    }
+
+    .code-textarea {
+        background: transparent !important;
+        color: var(--text-dim) !important;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+        line-height: 1.75;
+        padding: 20px !important;
+        border: none !important;
+        resize: vertical;
+        min-height: 460px;
+    }
+
+    .submit-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+
+    .submit-processing {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 18px;
+        padding: 16px 18px;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 6px;
+        background: rgba(255,255,255,.03);
+    }
+
+    .processing-spinner {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid rgba(255,255,255,.16);
+        border-top-color: var(--orange);
+        animation: review-spin .8s linear infinite;
+        flex-shrink: 0;
+    }
+
+    .processing-title {
+        margin: 0 0 4px;
+        color: var(--text-bright);
+        font-weight: 700;
+    }
+
+    .processing-copy {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: .92rem;
+    }
+
+    .is-submitting .submit-secondary {
+        pointer-events: none;
+        opacity: .55;
+    }
+
+    .is-submitting .code-textarea,
+    .is-submitting .form-select,
+    .is-submitting .file-input {
+        opacity: .8;
+    }
+
+    #generateReviewButton[disabled] {
+        opacity: .75;
+        cursor: wait;
+    }
+
+    @keyframes review-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .submit-secondary {
+        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .submit-side {
+        display: grid;
+        gap: 20px;
+        position: sticky;
+        top: 94px;
+    }
+
+    .preview-card,
+    .submit-tips {
+        padding: 24px;
+    }
+
+    .preview-container {
+        max-height: 420px;
+        overflow: auto;
+        margin-top: 18px;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 6px;
+        background: #0b0f14;
+    }
+
+    .preview-container code {
+        display: block;
+        min-height: 260px;
+        padding: 16px;
+        font-size: 12px;
+        background: transparent !important;
+    }
+
+    @media (max-width: 1100px) {
+        .submit-shell,
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .submit-side {
+            position: static;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .submit-main,
+        .preview-card,
+        .submit-tips {
+            padding: 22px;
+        }
+
+        .submit-actions {
+            flex-direction: column;
+        }
+
+        .submit-actions .btn-custom {
+            width: 100%;
+            justify-content: center;
+        }
+    }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const submitForm = document.getElementById('submitReviewForm');
     const codeTextarea = document.getElementById('code_text');
     const languageSelect = document.getElementById('language');
     const previewCode = document.getElementById('preview');
     const fileUpload = document.getElementById('file_upload');
-    
+    const generateReviewButton = document.getElementById('generateReviewButton');
+    const buttonLabel = generateReviewButton.querySelector('.button-label');
+    const submitProcessingState = document.getElementById('submitProcessingState');
+    let isSubmitting = false;
+
     function updatePreview() {
         const code = codeTextarea.value;
         const language = languageSelect.value;
-        
+
         if (code.trim()) {
             previewCode.textContent = code;
-            previewCode.className = `hljs language-${language}`;
+            previewCode.className = `hljs language-${language} font-mono`;
             hljs.highlightElement(previewCode);
         } else {
-            previewCode.textContent = 'Preview will appear here...';
-            previewCode.className = '';
+            previewCode.textContent = '// Your code preview will appear here';
+            previewCode.className = 'text-muted font-mono';
         }
     }
-    
+
     codeTextarea.addEventListener('input', updatePreview);
     languageSelect.addEventListener('change', updatePreview);
-    
-    // File upload handling
+
     fileUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                codeTextarea.value = e.target.result;
+            reader.onload = function(loadEvent) {
+                codeTextarea.value = loadEvent.target.result;
                 updatePreview();
-                
-                // Auto-detect language from file extension
                 const extension = file.name.split('.').pop().toLowerCase();
-                const languageMap = {
-                    'py': 'python',
-                    'js': 'javascript',
-                    'java': 'java',
-                    'cpp': 'cpp',
-                    'cs': 'csharp',
-                    'php': 'php',
-                    'rb': 'ruby',
-                    'go': 'go',
-                    'rs': 'rust',
-                    'swift': 'swift'
-                };
-                
+                const languageMap = { py: 'python', js: 'javascript', java: 'java', cpp: 'cpp', cs: 'csharp', php: 'php', rb: 'ruby', go: 'go', rs: 'rust', swift: 'swift' };
                 if (languageMap[extension]) {
                     languageSelect.value = languageMap[extension];
                     updatePreview();
@@ -261,9 +346,22 @@ document.addEventListener('DOMContentLoaded', function() {
             reader.readAsText(file);
         }
     });
-    
-    // Initialize preview
+
+    submitForm.addEventListener('submit', function(event) {
+        if (isSubmitting) {
+            event.preventDefault();
+            return;
+        }
+
+        isSubmitting = true;
+        submitForm.classList.add('is-submitting');
+        generateReviewButton.disabled = true;
+        generateReviewButton.setAttribute('aria-busy', 'true');
+        buttonLabel.textContent = 'Generating Review...';
+        submitProcessingState.hidden = false;
+    });
+
     updatePreview();
 });
 </script>
-{% endblock %} 
+{% endblock %}

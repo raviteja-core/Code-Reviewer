@@ -3,271 +3,609 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeReviewer</title>
+    <title>{% block title %}CodeReviewer — AI Code Intelligence{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary-color: #f8fafc;
-            --accent-color: #10b981;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border-color: #e2e8f0;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --bg: #07080b;
+            --bg2: #101319;
+            --bg3: #171b22;
+            --bg4: #1d2330;
+            --border: rgba(255,255,255,0.08);
+            --orange: #f97316;
+            --orange-dim: rgba(249,115,22,0.15);
+            --green: #34d399;
+            --red: #fb7185;
+            --blue: #60a5fa;
+            --cyan: #22d3ee;
+            --text: #f8fafc;
+            --text-muted: #c0cad8;
+            --text-dim: #e2e8f0;
+            --radius: 3px;
+            --radius-lg: 6px;
+            --cursor-main: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M14 2L26 14L14 26L2 14Z' fill='none' stroke='%23f97316' stroke-width='1.7'/%3E%3Cpath d='M14 8V20M8 14H20' fill='none' stroke='%23f97316' stroke-width='1.5' stroke-linecap='square'/%3E%3C/svg%3E") 14 14, auto;
+            --cursor-link: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M6 6H22V22H6Z' fill='none' stroke='%23f97316' stroke-width='1.8'/%3E%3Cpath d='M10 14H18M14 10L18 14L14 18' fill='none' stroke='%23f8fafc' stroke-width='1.8' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") 14 14, pointer;
         }
-        
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-        
+
+        * { box-sizing: border-box; }
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg);
+            background-image:
+                radial-gradient(circle at 20% 0%, rgba(249,115,22,0.14) 0%, transparent 32%),
+                radial-gradient(circle at 85% 15%, rgba(34,211,238,0.10) 0%, transparent 26%),
+                linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
             min-height: 100vh;
-            color: var(--text-primary);
+            cursor: var(--cursor-main);
         }
-        
-        .main-content {
-            background: white;
-            min-height: calc(100vh - 80px);
-            border-radius: 20px 20px 0 0;
-            margin-top: 20px;
-            box-shadow: var(--card-shadow);
+
+        code {
+            color: var(--text-dim);
         }
-        
-        .navbar {
-            background: rgba(255, 255, 255, 0.95) !important;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 0;
+
+        a,
+        button,
+        .btn-custom,
+        input[type="submit"],
+        input[type="button"],
+        select,
+        label[for],
+        summary {
+            cursor: var(--cursor-link);
         }
-        
-        .navbar-brand {
+
+        h1, h2, h3, h4, h5, h6, .navbar-brand {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+        }
+
+        /* Nav */
+        nav {
+            position: sticky; top: 0; z-index: 1000;
+            padding: 14px 28px 0;
+            background: linear-gradient(180deg, rgba(7,8,11,.92), rgba(7,8,11,.65));
+            backdrop-filter: blur(16px);
+        }
+
+        .nav-frame {
+            max-width: 1720px;
+            margin: 0 auto;
+            min-height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 0 18px;
+            background: rgba(12,14,19,.88);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 6px;
+            box-shadow: 0 16px 48px rgba(0,0,0,.24);
+            clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+        }
+
+        .nav-logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800; font-size: 1.34rem;
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.03em;
+        }
+        .nav-logo span { color: var(--orange); }
+        .nav-dot {
+            width: 10px; height: 10px;
+            background: var(--orange);
+            box-shadow: 0 0 12px var(--orange);
+            animation: pulse 2.6s infinite;
+            transform: rotate(45deg);
+            clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+        }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+        .nav-links {
+            display: flex; align-items: center; gap: 18px;
+            font-family: 'Syne', sans-serif;
+            font-size: .82rem; color: var(--text-muted);
             font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--primary-color) !important;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-links a { 
+            color: var(--text-muted); 
+            text-decoration: none;
+            transition: color .2s, transform .2s, border-color .2s, background .2s;
+            position: relative;
+            padding: 10px 14px;
+            border: 1px solid transparent;
+            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 7px;
+            height: 1px;
+            transform: scaleX(0);
+            transform-origin: center;
+            background: linear-gradient(90deg, transparent, var(--orange), transparent);
+            transition: transform .24s ease;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text);
+            transform: translateY(-1px);
+            border-color: rgba(255,255,255,.08);
+            background: rgba(255,255,255,.03);
+        }
+        .nav-links a:hover::after, .nav-links a.active::after { transform: scaleX(1); }
+
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+
+        /* Buttons */
+        .btn-custom {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 22px; border-radius: 4px;
+            font-family: 'DM Sans', sans-serif; font-size: .875rem; font-weight: 500;
+            cursor: pointer; border: none; transition: all .2s;
             text-decoration: none;
         }
-        
-        .navbar-brand:hover {
-            color: var(--primary-dark) !important;
+        .btn-ghost {
+            background: transparent; color: var(--text-dim);
         }
-        
-        .nav-link {
-            font-weight: 500;
-            color: var(--text-secondary) !important;
-            margin: 0 0.5rem;
-            padding: 0.5rem 1rem !important;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+        .btn-ghost:hover { color: var(--text); background: var(--bg3); }
+        .btn-primary-custom {
+            background: var(--orange); color: #000 !important;
+            box-shadow: 0 0 24px rgba(249,115,22,.25);
+            font-weight: 700;
         }
-        
-        .nav-link:hover {
-            color: var(--primary-color) !important;
-            background-color: rgba(99, 102, 241, 0.1);
+        .btn-primary-custom:hover { background: #ea6c0a; box-shadow: 0 0 32px rgba(249,115,22,.4); transform: translateY(-1px); }
+
+        /* Cards */
+        .glass-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            transition: border-color .2s, transform .2s;
+            clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
         }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            border: none;
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+
+        /* Layout */
+        .wide-container {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 48px;
         }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.3);
+
+        .home-shell {
+            width: 100%;
+            max-width: 1720px;
+            margin: 0 auto;
+            padding: 0 36px 80px;
         }
-        
-        .btn-outline-primary {
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
+
+        .page-shell {
+            width: 100%;
+            max-width: 1720px;
+            margin: 0 auto;
+            padding: 32px 36px 88px;
         }
-        
-        .btn-outline-primary:hover {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
+
+        .section-panel {
+            background: linear-gradient(180deg, rgba(16,19,25,.96), rgba(10,13,18,.96));
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 6px;
+            box-shadow: 0 22px 60px rgba(0,0,0,.24);
+            clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
         }
-        
-        .card {
-            border: none;
-            border-radius: 16px;
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s ease;
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 2px;
+            border: 1px solid rgba(249,115,22,.26);
+            background: rgba(249,115,22,.08);
+            color: #ffd8bf;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .75rem;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+        }
+
+        .page-title {
+            font-size: clamp(2.3rem, 4.4vw, 4.4rem);
+            line-height: 1;
+            letter-spacing: -0.05em;
+            margin: 18px 0 14px;
+            text-wrap: balance;
+        }
+
+        .page-lead {
+            max-width: 760px;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.75;
+            margin: 0;
+        }
+
+        .metric-card,
+        .product-card {
+            background: linear-gradient(180deg, rgba(17,21,29,.96), rgba(9,12,17,.96));
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 6px;
+            padding: 24px;
+            height: 100%;
+            position: relative;
             overflow: hidden;
+            clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
         }
-        
-        .card:hover {
-            box-shadow: var(--hover-shadow);
-            transform: translateY(-4px);
+
+        .symmetric-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
         }
-        
-        .card-header {
-            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-            border-bottom: 1px solid var(--border-color);
-            font-weight: 600;
-            color: var(--text-primary);
+
+        .symmetric-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
         }
-        
-        .form-control, .form-select {
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            transition: all 0.3s ease;
+
+        .metric-card::before,
+        .product-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(140deg, rgba(255,255,255,.05), transparent 40%);
+            pointer-events: none;
         }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+
+        .metric-label,
+        .panel-label {
+            color: var(--orange);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .75rem;
+            letter-spacing: .08em;
+            text-transform: uppercase;
         }
-        
-        .alert {
-            border: none;
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
+
+        .metric-value {
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.8rem, 3vw, 2.7rem);
+            line-height: 1;
+            letter-spacing: -0.04em;
+            margin: 16px 0 10px;
         }
-        
-        .alert-info {
-            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-            color: #1e40af;
+
+        .metric-copy,
+        .panel-copy {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin: 0;
         }
-        
-        .badge {
-            border-radius: 8px;
-            padding: 0.5rem 0.75rem;
-            font-weight: 500;
+
+        .list-clean {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
-        
-        .bg-success {
-            background: linear-gradient(135deg, var(--accent-color), #059669) !important;
+
+        .list-clean li {
+            color: var(--text-muted);
+            padding-left: 18px;
+            position: relative;
+            margin-bottom: 12px;
         }
-        
-        .bg-warning {
-            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
-        }
-        
-        .bg-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-        }
-        
-        .bg-secondary {
-            background: linear-gradient(135deg, #6b7280, #4b5563) !important;
-        }
-        
-        h1, h2, h3, h4, h5, h6 {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        
-        .text-muted {
-            color: var(--text-secondary) !important;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
+
+        .list-clean li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: .7em;
             width: 8px;
+            height: 8px;
+            background: var(--orange);
+            box-shadow: 0 0 12px rgba(249,115,22,.45);
+            clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
         }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
+
+        .text-muted {
+            color: var(--text-muted) !important;
         }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+
+        .alert {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            color: var(--text-dim);
             border-radius: 4px;
         }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+
+        footer.site-footer {
+            border-top: 1px solid rgba(255,255,255,.08);
+            background: rgba(8,10,14,.92);
+            backdrop-filter: blur(18px);
         }
-        
-        /* Animation classes */
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
+
+        .footer-shell {
+            width: 100%;
+            max-width: 1720px;
+            margin: 0 auto;
+            padding: 42px 36px 34px;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1fr;
+            gap: 26px;
         }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .main-content {
-                margin-top: 10px;
-                border-radius: 15px 15px 0 0;
-            }
-            
-            .navbar {
-                padding: 0.5rem 0;
-            }
-            
-            .navbar-brand {
-                font-size: 1.25rem;
-            }
+
+        .footer-brand {
+            max-width: 420px;
+        }
+
+        .footer-title {
+            color: var(--text);
+            font-size: .88rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a,
+        .footer-copy {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: var(--text);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            border-top: 1px solid rgba(255,255,255,.08);
+            margin-top: 28px;
+            padding-top: 20px;
+            color: var(--text-muted);
+            font-size: .92rem;
+        }
+
+        /* Forms */
+        .form-control, .form-select {
+            background: var(--bg3) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 4px !important;
+            color: var(--text) !important;
+            padding: 12px 16px !important;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .form-control:focus {
+            border-color: rgba(249,115,22,0.4) !important;
+            box-shadow: 0 0 0 2px var(--orange-dim) !important;
+        }
+
+        /* Animations */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px) scale(.985);
+            filter: blur(8px);
+            transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1), filter .9s cubic-bezier(.16,1,.3,1);
+            will-change: opacity, transform, filter;
+        }
+
+        .page-motion .fade-up.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+
+        .float { animation: float 6s ease-in-out infinite; }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Helper Classes */
+        .text-orange { color: var(--orange); }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .stat-num {
+            font-family: 'Syne', sans-serif; font-weight: 800;
+            font-size: clamp(2.2rem, 4vw, 3.5rem);
+            line-height: 1;
+            background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        @media (max-width: 900px) {
+            nav { padding: 12px 14px 0; }
+            .nav-frame { padding: 0 14px; min-height: 64px; }
+            .nav-links { display: none; }
+            .wide-container { padding: 0 20px; }
+            .home-shell { padding: 0 20px 64px; }
+            .page-shell { padding: 24px 20px 72px; }
+            .footer-shell { padding: 34px 20px 28px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .footer-bottom { flex-direction: column; }
+            .symmetric-grid-2,
+            .symmetric-grid-3 { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('dashboard.home') }}">
-                <i class="fas fa-code me-2"></i>CodeReviewer
-            </a>
+
+<nav>
+    <div class="nav-frame">
+        <a href="{{ url_for('dashboard.home') }}" class="nav-logo">
+            <div class="nav-dot"></div>
+            Code<span>Reviewer</span>
+        </a>
+        
+        <ul class="nav-links">
+            {% if request.endpoint == 'dashboard.home' %}
+            <li><a href="#workflow">How It Works</a></li>
+            <li><a href="#surfaces">Product Flow</a></li>
+            <li><a href="#product-nav-cta">Launch Review</a></li>
+            {% elif current_user.is_authenticated %}
+            <li><a href="{{ url_for('dashboard.dashboard') }}">Workspace</a></li>
+            <li><a href="{{ url_for('code.submit_code') }}">New Review</a></li>
+            <li><a href="{{ url_for('code.history') }}">Reports</a></li>
+            {% endif %}
+        </ul>
+
+        <div class="nav-right">
             {% if current_user.is_authenticated %}
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ url_for('dashboard.dashboard') }}">
-                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-                </a>
-                <a class="nav-link" href="{{ url_for('code.submit_code') }}">
-                    <i class="fas fa-plus me-1"></i>Submit Code
-                </a>
-                <a class="nav-link" href="{{ url_for('code.history') }}">
-                    <i class="fas fa-history me-1"></i>History
-                </a>
-                <a class="nav-link" href="{{ url_for('auth.logout') }}">
-                    <i class="fas fa-sign-out-alt me-1"></i>Logout
-                </a>
-            </div>
+                <a href="{{ url_for('auth.logout') }}" class="btn-custom btn-ghost">Logout</a>
             {% else %}
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ url_for('auth.login') }}">
-                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                <a href="{{ url_for('auth.login') }}" class="btn-custom btn-ghost">Sign in</a>
+                <a href="{{ url_for('auth.register') }}" class="btn-custom btn-primary-custom">
+                    {% if request.endpoint == 'dashboard.home' %}Open Product{% else %}Get Started →{% endif %}
                 </a>
-                <a class="nav-link" href="{{ url_for('auth.register') }}">
-                    <i class="fas fa-user-plus me-1"></i>Register
-                </a>
-            </div>
             {% endif %}
         </div>
-    </nav>
+    </div>
+</nav>
+
+<main class="{% block main_class %}page-shell{% endblock %}">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-info-circle me-2 text-orange"></i>{{ message }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
     
-    <div class="main-content">
-        <div class="container-fluid p-4">
-            {% with messages = get_flashed_messages() %}
-              {% if messages %}
-                <div class="alert alert-info fade-in">
-                  {% for message in messages %}
-                    <div><i class="fas fa-info-circle me-2"></i>{{ message }}</div>
-                  {% endfor %}
-                </div>
-              {% endif %}
-            {% endwith %}
-            {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="footer-shell">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="{{ url_for('dashboard.home') }}" class="nav-logo mb-3 d-inline-flex">
+                    <div class="nav-dot"></div>
+                    Code<span>Reviewer</span>
+                </a>
+                <p class="footer-copy mb-0">
+                    AI-assisted code review for solo builders and small teams. Submit code, get structured feedback, track review history, and iterate with clarity.
+                </p>
+            </div>
+
+            <div>
+                <div class="footer-title">Product</div>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('dashboard.home') }}">Landing</a></li>
+                    <li><a href="{{ url_for('code.submit_code') }}">Submit Code</a></li>
+                    {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('code.history') }}">History</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div>
+                <div class="footer-title">Workflow</div>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('code.submit_code') }}">Start a Review</a></li>
+                    {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('code.history') }}">Browse Reports</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}">Sign Out</a></li>
+                    {% else %}
+                    <li><a href="{{ url_for('auth.login') }}">Sign In</a></li>
+                    <li><a href="{{ url_for('auth.register') }}">Create Account</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div>
+                <div class="footer-title">Built For</div>
+                <ul class="footer-links">
+                    <li><span class="footer-copy">Students improving code quality</span></li>
+                    <li><span class="footer-copy">Developers checking logic and style</span></li>
+                    <li><span class="footer-copy">Small teams wanting a cleaner review loop</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>CodeReviewer product interface</span>
+            <span>Designed to feel fast, clear, and review-first</span>
         </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.body.classList.add('page-motion');
+
+    const revealNodes = Array.from(document.querySelectorAll('.fade-up, .report-card-rise'));
+    if (!revealNodes.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        revealNodes.forEach((node) => node.classList.add('is-visible'));
+        return;
+    }
+
+    revealNodes.forEach((node) => {
+        if (node.style.animationDelay && !node.style.transitionDelay) {
+            node.style.transitionDelay = node.style.animationDelay;
+        }
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                return;
+            }
+
+            entry.target.classList.remove('is-visible');
+        });
+    }, {
+        threshold: 0.18,
+        rootMargin: '-6% 0px -10% 0px'
+    });
+
+    revealNodes.forEach((node, index) => {
+        observer.observe(node);
+        if (node.getBoundingClientRect().top < window.innerHeight * 0.92) {
+            window.setTimeout(() => node.classList.add('is-visible'), 70 + (index * 55));
+        }
+    });
+});
+</script>
 </body>
 </html> 

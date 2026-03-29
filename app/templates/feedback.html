@@ -1,337 +1,480 @@
 {% extends 'base.html' %}
+{% block title %}CodeReviewer — Review Report{% endblock %}
 {% block content %}
-<div class="fade-in">
-    <div class="row mb-4">
-        <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="{{ url_for('dashboard.dashboard') }}" class="text-decoration-none">
-                            <i class="fas fa-home me-1"></i>Dashboard
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item active">Feedback</li>
-                </ol>
+<section class="fade-up report-entrance">
+    <div class="report-shell">
+        <div class="report-main">
+            <nav class="report-breadcrumb" aria-label="breadcrumb">
+                <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+                <span>/</span>
+                <span>Review #{{ submission.id }}</span>
             </nav>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="d-flex align-items-center mb-4">
-                <div class="bg-primary rounded-circle p-3 me-3">
-                    <i class="fas fa-robot text-white fs-4"></i>
-                </div>
-                <div>
-                    <h2 class="mb-1">Code Review Results</h2>
-                    <p class="text-muted mb-0">
-                        <i class="fas fa-hashtag me-1"></i>Submission #{{ submission.id }} - 
-                        <i class="fas fa-calendar me-1"></i>{{ submission.timestamp.strftime('%B %d, %Y at %I:%M %p') }}
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Language Information -->
-            {% if submission.detected_language and submission.detected_language != submission.language %}
-            <div class="alert alert-warning d-flex align-items-center" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <div>
-                    <strong>Language Mismatch Detected:</strong> 
-                    You selected <strong>{{ submission.language.upper() }}</strong> but the system detected <strong>{{ submission.detected_language.upper() }}</strong> code. 
-                    The analysis was performed for the detected language.
-                </div>
-            </div>
-            {% endif %}
-            
-            <!-- Score Display -->
-            {% if submission.ai_score %}
-            <div class="card mb-4">
-                <div class="card-body text-center py-5">
-                    <div class="mb-3">
-                        <i class="fas fa-chart-line text-primary" style="font-size: 3rem;"></i>
-                    </div>
-                    <h3 class="mb-3">Code Quality Score</h3>
-                    <div class="mb-3">
-                        <span class="badge {% if submission.ai_score >= 80 %}bg-success{% elif submission.ai_score >= 50 %}bg-warning{% else %}bg-danger{% endif %} fs-1 px-4 py-3">
-                            <i class="fas fa-star me-2"></i>{{ submission.ai_score }}/100
-                        </span>
-                    </div>
-                    <p class="text-muted fs-5">
-                        {% if submission.ai_score >= 80 %}
-                            <i class="fas fa-trophy text-warning me-2"></i>Excellent! Your code follows best practices well.
-                        {% elif submission.ai_score >= 50 %}
-                            <i class="fas fa-thumbs-up text-info me-2"></i>Good effort! There's room for improvement.
-                        {% else %}
-                            <i class="fas fa-lightbulb text-warning me-2"></i>Keep practicing! Review the suggestions below.
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-            {% endif %}
-            
-            <!-- AI Feedback -->
-            {% if submission.feedback %}
-            <div class="card mb-4">
-                <div class="card-header d-flex align-items-center">
-                    <i class="fas fa-robot me-2 text-primary"></i>
-                    <h5 class="mb-0">AI Analysis & Suggestions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="feedback-content">{{ submission.feedback|safe }}</div>
-                </div>
-            </div>
-            {% endif %}
-            
-            <!-- Plagiarism Hints -->
-            {% if submission.plagiarism_hints %}
-            <div class="card mb-4">
-                <div class="card-header d-flex align-items-center">
-                    <i class="fas fa-search me-2 text-primary"></i>
-                    <h5 class="mb-0">Plagiarism Detection</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted mb-0">{{ submission.plagiarism_hints }}</p>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        
-        <div class="col-lg-4">
-            <!-- Original Code -->
-            <div class="card mb-4">
-                <div class="card-header d-flex align-items-center">
-                    <i class="fas fa-code me-2 text-primary"></i>
-                    <h5 class="mb-0">Original Code</h5>
-                    <span class="badge bg-secondary ms-auto">{{ submission.language }}</span>
-                </div>
-                <div class="card-body">
-                    <div class="code-container">
-                        <pre><code class="hljs language-{{ submission.language }}">{{ submission.code_text }}</code></pre>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Inline Comments -->
-            {% if submission.comments %}
-            <div class="card">
-                <div class="card-header d-flex align-items-center">
-                    <i class="fas fa-comments me-2 text-primary"></i>
-                    <h5 class="mb-0">AI Comments</h5>
-                </div>
-                <div class="card-body">
-                    <div class="code-container">
-                        <pre><code class="hljs language-{{ submission.language }}">{{ submission.comments }}</code></pre>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="d-flex gap-3">
-                <a href="{{ url_for('code.submit_code') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>Submit New Code
-                </a>
-                <a href="{{ url_for('code.history') }}" class="btn btn-outline-primary">
-                    <i class="fas fa-history me-2"></i>View History
-                </a>
-                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Highlight.js for syntax highlighting -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+            <section class="section-panel report-hero report-card-rise">
+                <div class="report-hero-copy">
+                    <div class="eyebrow">Generated report</div>
+                    <h1 class="page-title">Structured feedback for submission #{{ submission.id }}</h1>
+                    <p class="page-lead">Read the score, scan the AI analysis, compare against the original code, and keep the report aligned with the rest of the product.</p>
+                </div>
+
+                <div class="report-score-card">
+                    <div class="panel-label">Quality score</div>
+                    <div class="report-score {% if submission.ai_score >= 80 %}score-good{% elif submission.ai_score >= 50 %}score-mid{% else %}score-low{% endif %}">
+                        {{ submission.ai_score or '0' }}/100
+                    </div>
+                    <p class="panel-copy">{{ submission.timestamp.strftime('%b %d, %Y') }}</p>
+                </div>
+            </section>
+
+            <div class="symmetric-grid-2 report-summary-grid">
+                <section class="product-card report-summary-card report-card-rise" style="animation-delay:.05s">
+                    <div class="panel-label">Language</div>
+                    <h2 class="panel-title">{{ submission.language|upper }}</h2>
+                    <p class="panel-copy">The review report preserves the submission language and keeps the source preview available beside the analysis.</p>
+                </section>
+
+                <section class="product-card report-summary-card report-card-rise" style="animation-delay:.1s">
+                    <div class="panel-label">Report flow</div>
+                    <h2 class="panel-title">Feedback, source, and notes stay aligned</h2>
+                    <p class="panel-copy">The screen is now balanced around two equal columns so the report feels symmetric instead of stacked awkwardly.</p>
+                </section>
+            </div>
+
+            {% if submission.feedback %}
+            <section class="product-card review-panel report-card-rise" style="animation-delay:.15s">
+                <div class="review-head">
+                    <div class="review-bot">CR</div>
+                    <div>
+                        <div class="panel-label">AI feedback</div>
+                        <h2 class="panel-title">CodeReviewer analysis</h2>
+                    </div>
+                </div>
+                <div class="ai-feedback-content">
+                    {{ submission.feedback|safe }}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if submission.plagiarism_hints %}
+            <section class="product-card warning-panel report-card-rise" style="animation-delay:.2s">
+                <div class="review-head">
+                    <div class="review-bot warning-bot">!</div>
+                    <div>
+                        <div class="panel-label">Integrity note</div>
+                        <h2 class="panel-title">Additional review hint</h2>
+                    </div>
+                </div>
+                <p class="panel-copy">{{ submission.plagiarism_hints }}</p>
+            </section>
+            {% endif %}
+        </div>
+
+        <aside class="report-side">
+            <section class="product-card sticky-card report-card-rise" style="animation-delay:.08s">
+                <div class="panel-label">Source preview</div>
+                <h2 class="panel-title">{{ submission.language|upper }} submission</h2>
+                <div class="preview-frame">
+                    <div class="preview-header">
+                        <span class="preview-dot"></span>
+                        <span class="preview-dot"></span>
+                        <span class="preview-dot"></span>
+                        <span class="preview-label">Original source</span>
+                    </div>
+                    <div class="preview-container">
+                        <pre class="mb-0 overflow-hidden"><code class="hljs language-{{ submission.language }} font-mono">{{ submission.code_text }}</code></pre>
+                    </div>
+                </div>
+
+                {% if submission.comments %}
+                <div class="annotation-panel">
+                    <div class="panel-label">Your notes</div>
+                    <pre><code>{{ submission.comments }}</code></pre>
+                </div>
+                {% endif %}
+
+                <div class="report-actions">
+                    <a href="{{ url_for('code.submit_code') }}" class="btn-custom btn-primary-custom btn-xl">New Review</a>
+                    <a href="{{ url_for('dashboard.dashboard') }}" class="btn-custom btn-ghost btn-xl report-secondary">Back to Dashboard</a>
+                </div>
+            </section>
+        </aside>
+    </div>
+</section>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/tokyo-night-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/java.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+
+<style>
+    .report-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1.18fr) minmax(380px, .82fr);
+        gap: 24px;
+        align-items: start;
+    }
+
+    .report-main,
+    .report-side {
+        min-width: 0;
+    }
+
+    .report-main {
+        display: grid;
+        gap: 24px;
+    }
+
+    .report-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-muted);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .82rem;
+    }
+
+    .report-breadcrumb a {
+        color: var(--orange);
+        text-decoration: none;
+    }
+
+    .report-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 250px;
+        gap: 24px;
+        align-items: stretch;
+        padding: 32px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .report-hero::before {
+        content: '';
+        position: absolute;
+        inset: auto -8% -30% auto;
+        width: 280px;
+        height: 280px;
+        border-radius: 0;
+        background: radial-gradient(circle, rgba(249,115,22,.12), transparent 70%);
+        filter: blur(18px);
+        pointer-events: none;
+    }
+
+    .report-hero-copy {
+        min-width: 0;
+    }
+
+    .report-hero .page-title {
+        font-size: clamp(2.4rem, 4vw, 4.8rem);
+        line-height: .92;
+        max-width: 10ch;
+        margin-bottom: 16px;
+    }
+
+    .report-hero .page-lead {
+        max-width: 56ch;
+    }
+
+    .report-score-card,
+    .report-summary-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .report-score-card {
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 6px;
+        clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+        padding: 22px;
+        background: rgba(255,255,255,.03);
+        min-height: 100%;
+        backdrop-filter: blur(12px);
+    }
+
+    .report-score {
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 1;
+        margin: 14px 0 10px;
+        letter-spacing: -0.05em;
+    }
+
+    .score-good { color: #bbf7d0; }
+    .score-mid { color: #fde68a; }
+    .score-low { color: #fecdd3; }
+
+    .report-summary-grid {
+        align-items: stretch;
+    }
+
+    .report-summary-card {
+        min-height: 168px;
+    }
+
+    .review-panel,
+    .warning-panel,
+    .sticky-card {
+        padding: 28px;
+    }
+
+    .review-head {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .review-bot {
+        width: 42px;
+        height: 42px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--orange), #fb923c);
+        color: #111;
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+    }
+
+    .warning-bot {
+        background: rgba(251,113,133,.16);
+        border: 1px solid rgba(251,113,133,.22);
+        color: #ffd1db;
+    }
+
+    .ai-feedback-content {
+        color: var(--text-dim);
+        line-height: 1.85;
+        display: grid;
+        gap: 16px;
+    }
+
+    .ai-feedback-content > :first-child {
+        margin-top: 0 !important;
+    }
+
+    .ai-feedback-content h1,
+    .ai-feedback-content h2,
+    .ai-feedback-content h3 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: .78rem;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--orange);
+        margin: 22px 0 2px;
+    }
+
+    .ai-feedback-content p {
+        margin: 0;
+        color: var(--text-muted);
+    }
+
+    .ai-feedback-content ul,
+    .ai-feedback-content ol {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 12px;
+    }
+
+    .ai-feedback-content li {
+        position: relative;
+        padding-left: 18px;
+        color: var(--text-muted);
+    }
+
+    .ai-feedback-content li::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: .7em;
+        width: 8px;
+        height: 8px;
+        border-radius: 0;
+        clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+        background: var(--orange);
+        box-shadow: 0 0 12px rgba(249,115,22,.36);
+    }
+
+    .ai-feedback-content code {
+        background: rgba(255,255,255,.06);
+        color: var(--text);
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .ai-feedback-content pre {
+        margin: 0;
+        padding: 16px;
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.03);
+        overflow: auto;
+    }
+
+    .ai-feedback-content pre code {
+        background: transparent;
+        padding: 0;
+    }
+
+    .ai-feedback-content blockquote {
+        margin: 0;
+        padding: 14px 16px;
+        border-left: 3px solid var(--orange);
+        background: rgba(249,115,22,.06);
+        border-radius: 0;
+        clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+        color: var(--text-dim);
+    }
+
+    .report-side {
+        position: sticky;
+        top: 94px;
+    }
+
+    .preview-frame {
+        margin-top: 18px;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 6px;
+        clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+        overflow: hidden;
+        background: rgba(255,255,255,.02);
+        animation: framePulse 7s ease-in-out infinite;
+    }
+
+    .preview-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        background: rgba(255,255,255,.02);
+    }
+
+    .preview-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 0;
+        background: rgba(255,255,255,.22);
+    }
+
+    .preview-label {
+        margin-left: 6px;
+        color: var(--text-muted);
+        font-size: .82rem;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .preview-container {
+        max-height: 520px;
+        overflow: auto;
+        background: #0b0f14;
+    }
+
+    .preview-container code {
+        display: block;
+        padding: 16px;
+        background: transparent !important;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .annotation-panel {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .annotation-panel pre {
+        margin: 12px 0 0;
+        padding: 14px;
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.03);
+        color: var(--text-muted);
+        white-space: pre-wrap;
+    }
+
+    .report-actions {
+        display: grid;
+        gap: 12px;
+        margin-top: 22px;
+    }
+
+    .btn-xl {
+        padding: 14px 24px;
+        border-radius: 4px;
+        justify-content: center;
+    }
+
+    .report-secondary {
+        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .report-card-rise {
+        opacity: 0;
+        transform: translateY(26px) scale(.985);
+        filter: blur(8px);
+        transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1), filter .9s cubic-bezier(.16,1,.3,1);
+    }
+
+    .page-motion .report-card-rise.is-visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+
+    @keyframes framePulse {
+        0%, 100% {
+            box-shadow: 0 0 0 rgba(249,115,22,0);
+        }
+        50% {
+            box-shadow: 0 0 32px rgba(249,115,22,.08);
+        }
+    }
+
+    @media (max-width: 1280px) {
+        .report-shell {
+            grid-template-columns: 1fr;
+        }
+
+        .report-side {
+            position: static;
+        }
+    }
+
+    @media (max-width: 1100px) {
+        .report-shell,
+        .report-hero {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 760px) {
+        .review-panel,
+        .warning-panel,
+        .sticky-card,
+        .report-hero {
+            padding: 22px;
+        }
+
+        .report-hero .page-title {
+            font-size: clamp(2rem, 10vw, 3.3rem);
+            max-width: none;
+        }
+
+        .report-summary-card {
+            min-height: auto;
+        }
+    }
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     hljs.highlightAll();
 });
 </script>
-
-<style>
-.breadcrumb {
-    background: none;
-    padding: 0;
-    margin: 0;
-}
-
-.breadcrumb-item a {
-    color: #6366f1;
-    font-weight: 500;
-}
-
-.breadcrumb-item.active {
-    color: #64748b;
-}
-
-.code-container {
-    background-color: #f8fafc;
-    border-radius: 8px;
-    padding: 1rem;
-    max-height: 500px;
-    overflow-y: auto;
-}
-
-.code-container pre {
-    margin: 0;
-    font-size: 12px;
-    line-height: 1.4;
-}
-
-.whitespace-pre-wrap {
-    white-space: pre-wrap;
-}
-
-.feedback-content {
-    line-height: 1.6;
-}
-
-.feedback-content h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #2c3e50;
-    margin-top: 1.5rem;
-    margin-bottom: 1rem;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 0.5rem;
-}
-
-.feedback-content h2 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border-bottom: none;
-}
-
-.feedback-content h3 {
-    font-size: 1.25rem;
-    font-weight: bold;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.25rem;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.feedback-content h4 {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #34495e;
-    margin-top: 0.75rem;
-    margin-bottom: 0.5rem;
-}
-
-.feedback-content p {
-    margin-bottom: 0.75rem;
-    line-height: 1.6;
-}
-
-.feedback-content ul, .feedback-content ol {
-    margin-bottom: 1rem;
-    padding-left: 1.5rem;
-}
-
-.feedback-content li {
-    margin-bottom: 0.5rem;
-    line-height: 1.5;
-}
-
-.feedback-content ul ul, .feedback-content ol ol {
-    margin-top: 0.25rem;
-    margin-bottom: 0.5rem;
-}
-
-.feedback-content ul ul li, .feedback-content ol ol li {
-    margin-bottom: 0.25rem;
-    font-size: 0.95em;
-    color: #555;
-}
-
-.feedback-content ul li strong, .feedback-content ol li strong {
-    color: #2c3e50;
-    font-weight: 600;
-}
-
-.feedback-content strong {
-    font-weight: bold;
-    color: #2c3e50;
-}
-
-.feedback-content em {
-    font-style: italic;
-    color: #7f8c8d;
-}
-
-.feedback-content code {
-    background-color: #f8f9fa;
-    padding: 0.2rem 0.4rem;
-    border-radius: 0.25rem;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
-}
-
-.feedback-content pre {
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid #e9ecef;
-    overflow-x: auto;
-    margin: 1rem 0;
-}
-
-.feedback-content blockquote {
-    border-left: 4px solid #3498db;
-    padding-left: 1rem;
-    margin: 1rem 0;
-    color: #7f8c8d;
-    font-style: italic;
-}
-
-.feedback-content ul li strong {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-    padding: 0.2rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.9em;
-    margin-right: 0.5rem;
-}
-
-/* Custom scrollbar for code containers */
-.code-container::-webkit-scrollbar {
-    width: 6px;
-}
-
-.code-container::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 3px;
-}
-
-.code-container::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 3px;
-}
-
-.code-container::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-</style>
-{% endblock %} 
+{% endblock %}
