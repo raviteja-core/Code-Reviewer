@@ -1,18 +1,50 @@
 import os
 
+from dotenv import load_dotenv
 from flask import Flask, jsonify
 from flask_login import LoginManager
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .models import User
 from .supabase_config import get_supabase_manager
-from dotenv import load_dotenv
+
+
+def _load_default_config():
+    environment = os.getenv('FLASK_ENV', 'development').lower()
+    is_production = environment == 'production'
+
+    secret_key = os.getenv('SECRET_KEY')
+    if not secret_key and not is_production:
+        secret_key = 'dev-secret-key-change-in-production'
+
+    config = {
+        'ENVIRONMENT': environment,
+        'SECRET_KEY': secret_key,
+        'SUPABASE_URL': os.getenv('SUPABASE_URL'),
+        'SUPABASE_ANON_KEY': os.getenv('SUPABASE_ANON_KEY'),
+        'SUPABASE_SERVICE_ROLE_KEY': os.getenv('SUPABASE_SERVICE_ROLE_KEY'),
+        'GROQ_API_KEY': os.getenv('GROQ_API_KEY'),
+        'DEBUG': not is_production,
+    }
+
+    if is_production:
+        config.update(
+            SESSION_COOKIE_SECURE=True,
+            SESSION_COOKIE_HTTPONLY=True,
+            SESSION_COOKIE_SAMESITE='Lax',
+            REMEMBER_COOKIE_SECURE=True,
+            REMEMBER_COOKIE_HTTPONLY=True,
+            PREFERRED_URL_SCHEME='https',
+        )
+
+    return config
 
 
 def create_app():
     load_dotenv()
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_pyfile('config.py')
+    app.config.from_mapping(_load_default_config())
+    app.config.from_pyfile('config.py', silent=True)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     is_production = app.config.get('ENVIRONMENT') == 'production'
