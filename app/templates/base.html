@@ -589,20 +589,18 @@ document.addEventListener('DOMContentLoaded', function () {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('is-visible');
-                return;
+                observer.unobserve(entry.target);
             }
-
-            entry.target.classList.remove('is-visible');
         });
     }, {
-        threshold: 0.18,
-        rootMargin: '-6% 0px -10% 0px'
+        threshold: 0.02,
+        rootMargin: '0px 0px 50px 0px'
     });
 
     revealNodes.forEach((node, index) => {
         observer.observe(node);
-        if (node.getBoundingClientRect().top < window.innerHeight * 0.92) {
-            window.setTimeout(() => node.classList.add('is-visible'), 70 + (index * 55));
+        if (node.getBoundingClientRect().top < window.innerHeight * 0.95) {
+            window.setTimeout(() => node.classList.add('is-visible'), 50 + (index * 40));
         }
     });
 });

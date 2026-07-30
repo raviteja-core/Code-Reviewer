@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+import os
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from flask_login import login_required, current_user
 from ..models import CodeSubmission
 from ..utils.ai_utils import analyze_code_with_groq
 from ..supabase_config import get_supabase_manager
-import os
 
 bp = Blueprint('code', __name__)
 
@@ -18,7 +18,9 @@ def submit_code():
             flash('Please enter some code to review.')
             return redirect(url_for('code.submit_code'))
         
-        # Analyze code with Gemini API
+        current_app.logger.info(f"User {current_user.id} submitted code for review ({len(code_text)} chars, selected lang: {language})")
+        
+        # Analyze code with Groq API
         try:
             feedback, score, comments = analyze_code_with_groq(code_text, language)
             
@@ -39,18 +41,23 @@ def submit_code():
             )
             
             if submission_data:
+                current_app.logger.info(f"Code review successfully created with submission ID {submission_data['id']}")
                 # Check if this was a fallback analysis
                 if "basic analysis" in feedback.lower() or "note: this is a basic analysis" in feedback.lower():
                     flash('⚠️ AI service was temporarily unavailable. Showing basic analysis instead.')
                 
                 return redirect(url_for('code.view_feedback', submission_id=submission_data['id']))
             else:
+                current_app.logger.error(f"Failed to save submission data in database for user {current_user.id}")
                 flash('❌ Error saving submission. Please try again.')
                 return redirect(url_for('code.submit_code'))
             
         except Exception as e:
             error_message = str(e)
+            current_app.logger.error(f"Code review submission error for user {current_user.id}: {error_message}")
             if "quota exceeded" in error_message.lower():
+                flash(f'⚠️ {error_message}')
+            elif "too large" in error_message.lower():
                 flash(f'⚠️ {error_message}')
             elif "API key" in error_message.lower():
                 flash(f'❌ {error_message}')
@@ -68,12 +75,14 @@ def view_feedback(submission_id):
         submission_data = supabase_manager.get_submission_by_id(submission_id)
         
         if not submission_data or submission_data['user_id'] != current_user.id:
+            current_app.logger.warning(f"User {current_user.id} attempted to view unauthorized submission ID {submission_id}")
             flash('Submission not found.')
             return redirect(url_for('dashboard.dashboard'))
         
         submission = CodeSubmission.from_dict(submission_data)
         return render_template('feedback.html', submission=submission)
     except Exception as e:
+        current_app.logger.error(f"Error loading submission {submission_id}: {e}")
         flash('Error loading submission.')
         return redirect(url_for('dashboard.dashboard'))
 
@@ -133,6 +142,6 @@ def history():
         return render_template('history.html', submissions=pagination, 
                              language_filter=language_filter, score_filter=score_filter)
     except Exception as e:
-        print(f"History error: {e}")
+        current_app.logger.error(f"History route error for user {current_user.id}: {e}")
         return render_template('history.html', submissions=None, 
-                             language_filter='', score_filter='') 
+                             language_filter='', score_filter='')

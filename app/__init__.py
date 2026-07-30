@@ -5,6 +5,7 @@ from flask import Flask, jsonify
 from flask_login import LoginManager
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+from .logging_config import setup_logging
 from .models import User
 from .supabase_config import get_supabase_manager
 
@@ -45,6 +46,7 @@ def create_app():
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(_load_default_config())
     app.config.from_pyfile('config.py', silent=True)
+    setup_logging(app)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     is_production = app.config.get('ENVIRONMENT') == 'production'

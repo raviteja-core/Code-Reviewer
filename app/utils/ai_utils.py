@@ -1,9 +1,13 @@
 import os
 import json
 import time
+import logging
+import re
 from groq import Groq
 import markdown2
 from typing import Tuple
+
+logger = logging.getLogger(__name__)
 
 def detect_language(code_text: str) -> str:
     """
@@ -108,13 +112,15 @@ def analyze_code_with_groq(code_text: str, language: str, max_retries: int = 3):
     if detected_language != 'unknown' and detected_language != language.lower():
         language_mismatch = True
         language_warning = f"⚠️ **Language Mismatch Detected:** The code appears to be {detected_language.upper()} but you selected {language.upper()}. Analysis will be performed for the detected language ({detected_language.upper()})."
-        # Use the detected language for analysis
         analysis_language = detected_language
+        logger.info(f"Language mismatch detected: user selected '{language}', detected '{detected_language}'")
     else:
         analysis_language = language
+        logger.info(f"Analyzing code with language: '{analysis_language}'")
     
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
+        logger.error("GROQ_API_KEY environment variable missing")
         raise Exception("GROQ_API_KEY not found in environment variables")
     
     client = Groq(api_key=api_key)
@@ -175,6 +181,7 @@ def analyze_code_with_groq(code_text: str, language: str, max_retries: int = 3):
     
     for attempt in range(max_retries):
         try:
+            logger.info(f"Sending request to Groq API (Attempt {attempt + 1}/{max_retries})...")
             completion = client.chat.completions.create(
                 model="openai/gpt-oss-120b",
                 messages=[
@@ -184,7 +191,7 @@ def analyze_code_with_groq(code_text: str, language: str, max_retries: int = 3):
                   }
                 ],
                 temperature=1,
-                max_completion_tokens=8192,
+                max_completion_tokens=2048,
                 top_p=1,
                 reasoning_effort="medium",
                 stream=True,
@@ -195,69 +202,87 @@ def analyze_code_with_groq(code_text: str, language: str, max_retries: int = 3):
             for chunk in completion:
                 content += chunk.choices[0].delta.content or ""
             
-            # Parse the response for FEEDBACK, SCORE, COMMENTS
-            feedback, score, comments = '', 50, ''
+            # Parse the response for FEEDBACK, SCORE, COMMENTS using robust regex & string splitting
+            feedback, score, comments = '', 75, ''
             try:
-                sections = content.split('---')
-                for section in sections:
-                    if section.strip().startswith('FEEDBACK:'):
-                        feedback = section.strip().replace('FEEDBACK:', '').strip()
-                    elif section.strip().startswith('SCORE:'):
-                        try:
-                            score = int(section.strip().replace('SCORE:', '').strip())
-                        except Exception:
-                            score = 50
-                    elif section.strip().startswith('COMMENTS:'):
-                        comments = section.strip().replace('COMMENTS:', '').strip()
-                if not feedback:
-                    feedback = content.strip()
-            except Exception:
+                # 1. Parse Score
+                score_match = re.search(r'SCORE:\s*\*?\*?\s*(\d+)', content, re.IGNORECASE)
+                if score_match:
+                    raw_val = int(score_match.group(1))
+                    score = raw_val * 10 if raw_val <= 10 else min(raw_val, 100)
+                
+                # 2. Parse Feedback
+                if 'FEEDBACK:' in content:
+                    fb_parts = content.split('FEEDBACK:', 1)
+                    after_fb = fb_parts[1]
+                    end_idx = len(after_fb)
+                    for marker in ['SCORE:', 'COMMENTS:', '--- SCORE']:
+                        idx = after_fb.find(marker)
+                        if idx != -1 and idx < end_idx:
+                            end_idx = idx
+                    feedback = after_fb[:end_idx].strip()
+                    feedback = re.sub(r'^\s*---\s*', '', feedback)
+                    feedback = re.sub(r'\s*---\s*$', '', feedback).strip()
+                else:
+                    # Remove trailing SCORE and COMMENTS sections if raw output returned
+                    feedback_clean = content
+                    for marker in ['SCORE:', 'COMMENTS:', '--- SCORE']:
+                        idx = feedback_clean.find(marker)
+                        if idx != -1:
+                            feedback_clean = feedback_clean[:idx]
+                    feedback = feedback_clean.strip()
+                    feedback = re.sub(r'^\s*---\s*', '', feedback)
+                    feedback = re.sub(r'\s*---\s*$', '', feedback).strip()
+                
+                # 3. Parse Comments
+                if 'COMMENTS:' in content:
+                    c_parts = content.split('COMMENTS:', 1)
+                    c_after = c_parts[1]
+                    c_end = len(c_after)
+                    idx = c_after.find('---')
+                    if idx != -1:
+                        c_end = idx
+                    comments = c_after[:c_end].strip()
+            except Exception as parse_err:
+                logger.warning(f"Error parsing Groq output structured sections: {parse_err}")
                 feedback = content.strip()
-                score = 50
+                score = 75
                 comments = ''
             
             # Add language mismatch warning if applicable
             if language_mismatch:
                 feedback = f"{language_warning}\n\n{feedback}"
             
-            # Convert feedback to HTML using markdown2 for better formatting
             feedback_html = markdown2.markdown(feedback)
+            logger.info("Successfully received and parsed AI review response from Groq")
             return feedback_html, score, comments
             
         except Exception as e:
-            if "quota" in str(e).lower() or "limit" in str(e).lower():
-                raise Exception("Groq AI service quota exceeded. Please try again later or contact support.")
-            elif "401" in str(e) or "unauthorized" in str(e).lower() or "api key" in str(e).lower():
-                raise Exception("Access denied to Groq AI. Please check your API key and permissions.")
-            elif "503" in str(e) or "unavailable" in str(e).lower() or "overloaded" in str(e).lower():
-                if attempt < max_retries - 1:
-                    wait_time = (2 ** attempt) + 1
-                    time.sleep(wait_time)
-                    continue
-                else:
-                    feedback, score, comments = basic_code_analysis(code_text, analysis_language)
-                    if language_mismatch:
-                        feedback = f"{language_warning}\n\n{feedback}"
-                    feedback_html = markdown2.markdown(feedback)
-                    return feedback_html, score, comments
-            else:
-                raise Exception(f"Unexpected error occurred: {str(e)}")
+            err_msg = str(e)
+            err_lower = err_msg.lower()
+            logger.error(f"Groq API error on attempt {attempt + 1}: {err_msg}")
             
-        except Exception as e:
-            if "503" in str(e) or "UNAVAILABLE" in str(e):
+            if "413" in err_lower or "too large" in err_lower:
+                raise Exception("Code payload is too large for AI review. Please submit a smaller snippet.")
+            elif "429" in err_lower or ("quota" in err_lower and "exceeded" in err_lower):
+                raise Exception("Groq AI service quota exceeded. Please try again later or contact support.")
+            elif "401" in err_lower or "unauthorized" in err_lower or "api key" in err_lower:
+                raise Exception("Access denied to Groq AI. Please check your API key and permissions.")
+            elif "503" in err_lower or "unavailable" in err_lower or "overloaded" in err_lower:
                 if attempt < max_retries - 1:
                     wait_time = (2 ** attempt) + 1
+                    logger.warning(f"Groq service unavailable, retrying in {wait_time}s...")
                     time.sleep(wait_time)
                     continue
                 else:
-                    # Use fallback analysis when AI service is overloaded
+                    logger.warning("Groq service unavailable after max retries; falling back to basic analysis")
                     feedback, score, comments = basic_code_analysis(code_text, analysis_language)
                     if language_mismatch:
                         feedback = f"{language_warning}\n\n{feedback}"
                     feedback_html = markdown2.markdown(feedback)
                     return feedback_html, score, comments
             else:
-                raise Exception(f"Unexpected error occurred: {str(e)}")
+                raise Exception(f"Unexpected error occurred: {err_msg}")
 
 def detect_plagiarism_hints(code_text: str) -> str:
     """
@@ -433,10 +458,11 @@ def basic_code_analysis(code_text: str, language: str) -> Tuple[str, int, str]:
 
 def generate_inline_comments(code_text: str, language: str, max_retries: int = 3) -> str:
     """
-    Generate inline comments for code using Google Gemini AI with retry logic.
+    Generate inline comments for code using Groq AI with retry logic.
     """
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
+        logger.warning("GROQ_API_KEY unavailable for generating inline comments")
         return "Comments could not be generated - API key not available"
     
     client = Groq(api_key=api_key)
@@ -450,6 +476,7 @@ def generate_inline_comments(code_text: str, language: str, max_retries: int = 3
     
     for attempt in range(max_retries):
         try:
+            logger.info(f"Generating inline comments via Groq (Attempt {attempt + 1}/{max_retries})...")
             completion = client.chat.completions.create(
                 model="openai/gpt-oss-120b",
                 messages=[
@@ -459,7 +486,7 @@ def generate_inline_comments(code_text: str, language: str, max_retries: int = 3
                   }
                 ],
                 temperature=1,
-                max_completion_tokens=8192,
+                max_completion_tokens=2048,
                 top_p=1,
                 reasoning_effort="medium",
                 stream=True,
@@ -472,14 +499,18 @@ def generate_inline_comments(code_text: str, language: str, max_retries: int = 3
             return content
             
         except Exception as e:
-            if "503" in str(e) or "unavailable" in str(e).lower() or "overloaded" in str(e).lower():
+            err_msg = str(e)
+            err_lower = err_msg.lower()
+            logger.error(f"Error generating inline comments (attempt {attempt + 1}): {err_msg}")
+            
+            if "503" in err_lower or "unavailable" in err_lower or "overloaded" in err_lower:
                 if attempt < max_retries - 1:
                     wait_time = (2 ** attempt) + 1
                     time.sleep(wait_time)
                     continue
                 else:
                     return f"Comments could not be generated - Groq AI service is currently unavailable. Please try again in a few minutes. (Attempt {attempt + 1}/{max_retries})"
-            elif "quota" in str(e).lower() or "limit" in str(e).lower():
+            elif "429" in err_lower or ("quota" in err_lower and "exceeded" in err_lower):
                 return "Comments could not be generated - Groq AI service quota exceeded. Please try again later."
             else:
-                return f"Comments could not be generated - Unexpected error: {str(e)}" 
+                return f"Comments could not be generated - Unexpected error: {err_msg}" 

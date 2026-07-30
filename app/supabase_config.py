@@ -1,7 +1,10 @@
 import os
+import logging
 from supabase import create_client, Client
 from typing import Optional, Dict, Any, List
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 class SupabaseManager:
     def __init__(self):
@@ -19,13 +22,15 @@ class SupabaseManager:
                 supabase_url=self.supabase_url,
                 supabase_key=self.supabase_key
             )
+            logger.info("Supabase client successfully initialized.")
         except Exception as e:
-            print(f"Supabase client initialization error: {e}")
+            logger.warning(f"Supabase client initialization error: {e}")
             # Try alternative initialization method
             try:
                 self.client = create_client(self.supabase_url, self.supabase_key)
+                logger.info("Alternative Supabase initialization succeeded.")
             except Exception as e2:
-                print(f"Alternative Supabase initialization failed: {e2}")
+                logger.error(f"Alternative Supabase initialization failed: {e2}")
                 raise
     
     def get_user_by_id(self, user_id: int) -> Optional[Dict[str, Any]]:
@@ -34,7 +39,7 @@ class SupabaseManager:
             response = self.client.table('users').select('*').eq('id', user_id).execute()
             return response.data[0] if response.data else None
         except Exception as e:
-            print(f"Error getting user by ID: {e}")
+            logger.error(f"Error getting user by ID ({user_id}): {e}")
             return None
     
     def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
@@ -43,7 +48,7 @@ class SupabaseManager:
             response = self.client.table('users').select('*').eq('email', email).execute()
             return response.data[0] if response.data else None
         except Exception as e:
-            print(f"Error getting user by email: {e}")
+            logger.error(f"Error getting user by email ({email}): {e}")
             return None
     
     def create_user(self, name: str, email: str, password_hash: str) -> Optional[Dict[str, Any]]:
@@ -56,9 +61,10 @@ class SupabaseManager:
                 'created_at': datetime.utcnow().isoformat()
             }
             response = self.client.table('users').insert(user_data).execute()
+            logger.info(f"Successfully created user in Supabase: {email}")
             return response.data[0] if response.data else None
         except Exception as e:
-            print(f"Error creating user: {e}")
+            logger.error(f"Error creating user ({email}): {e}")
             return None
     
     def get_user_submissions(self, user_id: int) -> List[Dict[str, Any]]:
@@ -67,7 +73,7 @@ class SupabaseManager:
             response = self.client.table('code_submissions').select('*').eq('user_id', user_id).order('timestamp', desc=True).execute()
             return response.data
         except Exception as e:
-            print(f"Error getting user submissions: {e}")
+            logger.error(f"Error getting submissions for user ({user_id}): {e}")
             return []
     
     def create_submission(self, user_id: int, code_text: str, language: str = None, 
@@ -88,18 +94,20 @@ class SupabaseManager:
                 'timestamp': datetime.utcnow().isoformat()
             }
             response = self.client.table('code_submissions').insert(submission_data).execute()
+            logger.info(f"Successfully saved code submission for user ID {user_id}")
             return response.data[0] if response.data else None
         except Exception as e:
-            print(f"Error creating submission: {e}")
+            logger.error(f"Error creating submission for user ID {user_id}: {e}")
             return None
     
     def update_submission(self, submission_id: int, **kwargs) -> Optional[Dict[str, Any]]:
         """Update a submission"""
         try:
             response = self.client.table('code_submissions').update(kwargs).eq('id', submission_id).execute()
+            logger.info(f"Successfully updated submission ID {submission_id}")
             return response.data[0] if response.data else None
         except Exception as e:
-            print(f"Error updating submission: {e}")
+            logger.error(f"Error updating submission ID {submission_id}: {e}")
             return None
     
     def get_submission_by_id(self, submission_id: int) -> Optional[Dict[str, Any]]:
@@ -108,7 +116,7 @@ class SupabaseManager:
             response = self.client.table('code_submissions').select('*').eq('id', submission_id).execute()
             return response.data[0] if response.data else None
         except Exception as e:
-            print(f"Error getting submission by ID: {e}")
+            logger.error(f"Error getting submission by ID ({submission_id}): {e}")
             return None
     
     def get_all_submissions(self) -> List[Dict[str, Any]]:
@@ -117,7 +125,7 @@ class SupabaseManager:
             response = self.client.table('code_submissions').select('*').order('timestamp', desc=True).execute()
             return response.data
         except Exception as e:
-            print(f"Error getting all submissions: {e}")
+            logger.error(f"Error getting all submissions: {e}")
             return []
 
 # Global instance
@@ -132,7 +140,7 @@ def get_supabase_manager():
         except Exception as e:
             if os.getenv('FLASK_ENV', 'development').lower() == 'production':
                 raise
-            print(f"Failed to initialize Supabase, using mock manager: {e}")
+            logger.warning(f"Failed to initialize Supabase, using mock manager: {e}")
             from .dev_config import get_mock_supabase_manager
             supabase_manager = get_mock_supabase_manager()
     return supabase_manager

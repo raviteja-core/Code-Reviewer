@@ -14,12 +14,14 @@
                 <div class="report-hero-copy">
                     <div class="eyebrow">Generated report</div>
                     <h1 class="page-title">Structured feedback for submission #{{ submission.id }}</h1>
-                    <p class="page-lead">Read the score, scan the AI analysis, compare against the original code, and keep the report aligned with the rest of the product.</p>
+                    <p class="page-lead">Read the score, scan the AI analysis, compare against the original code, and
+                        keep the report aligned with the rest of the product.</p>
                 </div>
 
                 <div class="report-score-card">
                     <div class="panel-label">Quality score</div>
-                    <div class="report-score {% if submission.ai_score >= 80 %}score-good{% elif submission.ai_score >= 50 %}score-mid{% else %}score-low{% endif %}">
+                    <div
+                        class="report-score {% if submission.ai_score >= 80 %}score-good{% elif submission.ai_score >= 50 %}score-mid{% else %}score-low{% endif %}">
                         {{ submission.ai_score or '0' }}/100
                     </div>
                     <p class="panel-copy">{{ submission.timestamp.strftime('%b %d, %Y') }}</p>
@@ -30,13 +32,15 @@
                 <section class="product-card report-summary-card report-card-rise" style="animation-delay:.05s">
                     <div class="panel-label">Language</div>
                     <h2 class="panel-title">{{ submission.language|upper }}</h2>
-                    <p class="panel-copy">The review report preserves the submission language and keeps the source preview available beside the analysis.</p>
+                    <p class="panel-copy">The review report preserves the submission language and keeps the source
+                        preview available beside the analysis.</p>
                 </section>
 
                 <section class="product-card report-summary-card report-card-rise" style="animation-delay:.1s">
                     <div class="panel-label">Report flow</div>
                     <h2 class="panel-title">Feedback, source, and notes stay aligned</h2>
-                    <p class="panel-copy">The screen is now balanced around two equal columns so the report feels symmetric instead of stacked awkwardly.</p>
+                    <p class="panel-copy">The screen is now balanced around two equal columns so the report feels
+                        symmetric instead of stacked awkwardly.</p>
                 </section>
             </div>
 
@@ -81,7 +85,8 @@
                         <span class="preview-label">Original source</span>
                     </div>
                     <div class="preview-container">
-                        <pre class="mb-0 overflow-hidden"><code class="hljs language-{{ submission.language }} font-mono">{{ submission.code_text }}</code></pre>
+                        <pre
+                            class="mb-0"><code class="hljs language-{{ submission.language }} font-mono">{{ submission.code_text }}</code></pre>
                     </div>
                 </div>
 
@@ -93,18 +98,31 @@
                 {% endif %}
 
                 <div class="report-actions">
-                    <a href="{{ url_for('code.submit_code') }}" class="btn-custom btn-primary-custom btn-xl">New Review</a>
-                    <a href="{{ url_for('dashboard.dashboard') }}" class="btn-custom btn-ghost btn-xl report-secondary">Back to Dashboard</a>
+                    <a href="{{ url_for('code.submit_code') }}" class="btn-custom btn-primary-custom btn-xl">New
+                        Review</a>
+                    <a href="{{ url_for('dashboard.dashboard') }}"
+                        class="btn-custom btn-ghost btn-xl report-secondary">Back to Dashboard</a>
                 </div>
             </section>
         </aside>
     </div>
 </section>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/tokyo-night-dark.min.css">
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/tokyo-night-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 
 <style>
+    .preview-container {
+        max-height: 520px;
+        overflow: auto;
+        background: #0b0f14;
+    }
+
+    .preview-container pre {
+        overflow-x: auto;
+    }
+
     .report-shell {
         display: grid;
         grid-template-columns: minmax(0, 1.18fr) minmax(380px, .82fr);
@@ -153,7 +171,7 @@
         width: 280px;
         height: 280px;
         border-radius: 0;
-        background: radial-gradient(circle, rgba(249,115,22,.12), transparent 70%);
+        background: radial-gradient(circle, rgba(249, 115, 22, .12), transparent 70%);
         filter: blur(18px);
         pointer-events: none;
     }
@@ -181,11 +199,11 @@
     }
 
     .report-score-card {
-        border: 1px solid rgba(255,255,255,.08);
+        border: 1px solid rgba(255, 255, 255, .08);
         border-radius: 6px;
         clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
         padding: 22px;
-        background: rgba(255,255,255,.03);
+        background: rgba(255, 255, 255, .03);
         min-height: 100%;
         backdrop-filter: blur(12px);
     }
@@ -198,9 +216,17 @@
         letter-spacing: -0.05em;
     }
 
-    .score-good { color: #bbf7d0; }
-    .score-mid { color: #fde68a; }
-    .score-low { color: #fecdd3; }
+    .score-good {
+        color: #bbf7d0;
+    }
+
+    .score-mid {
+        color: #fde68a;
+    }
+
+    .score-low {
+        color: #fecdd3;
+    }
 
     .report-summary-grid {
         align-items: stretch;
@@ -237,50 +263,79 @@
     }
 
     .warning-bot {
-        background: rgba(251,113,133,.16);
-        border: 1px solid rgba(251,113,133,.22);
+        background: rgba(251, 113, 133, .16);
+        border: 1px solid rgba(251, 113, 133, .22);
         color: #ffd1db;
     }
 
     .ai-feedback-content {
         color: var(--text-dim);
         line-height: 1.85;
-        display: grid;
-        gap: 16px;
+        display: block;
     }
 
     .ai-feedback-content > :first-child {
         margin-top: 0 !important;
     }
 
-    .ai-feedback-content h1,
-    .ai-feedback-content h2,
-    .ai-feedback-content h3 {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: .78rem;
-        letter-spacing: .08em;
-        text-transform: uppercase;
+    .ai-feedback-content h1 {
+        font-family: 'Syne', sans-serif;
+        font-size: 1.35rem;
+        font-weight: 700;
         color: var(--orange);
-        margin: 22px 0 2px;
+        margin: 28px 0 12px;
+        letter-spacing: -0.02em;
+    }
+
+    .ai-feedback-content h2 {
+        font-family: 'Syne', sans-serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--orange);
+        margin: 24px 0 10px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .ai-feedback-content h3,
+    .ai-feedback-content h4 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: #fca5a5;
+        margin: 18px 0 8px;
     }
 
     .ai-feedback-content p {
-        margin: 0;
+        margin: 0 0 14px 0;
         color: var(--text-muted);
+    }
+
+    .ai-feedback-content strong {
+        color: #f3f4f6;
+        font-weight: 600;
+    }
+
+    .ai-feedback-content hr {
+        border: none;
+        border-top: 1px dashed rgba(255,255,255,.1);
+        margin: 20px 0;
     }
 
     .ai-feedback-content ul,
     .ai-feedback-content ol {
-        margin: 0;
+        margin: 0 0 16px 0;
         padding: 0;
         list-style: none;
         display: grid;
-        gap: 12px;
+        gap: 10px;
     }
 
     .ai-feedback-content li {
         position: relative;
-        padding-left: 18px;
+        padding-left: 20px;
         color: var(--text-muted);
     }
 
@@ -288,17 +343,17 @@
         content: '';
         position: absolute;
         left: 0;
-        top: .7em;
-        width: 8px;
-        height: 8px;
+        top: .65em;
+        width: 7px;
+        height: 7px;
         border-radius: 0;
         clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
         background: var(--orange);
-        box-shadow: 0 0 12px rgba(249,115,22,.36);
+        box-shadow: 0 0 12px rgba(249, 115, 22, .36);
     }
 
     .ai-feedback-content code {
-        background: rgba(255,255,255,.06);
+        background: rgba(255, 255, 255, .06);
         color: var(--text);
         padding: 2px 6px;
         border-radius: 3px;
@@ -309,8 +364,8 @@
         margin: 0;
         padding: 16px;
         border-radius: 6px;
-        border: 1px solid rgba(255,255,255,.08);
-        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(255, 255, 255, .08);
+        background: rgba(255, 255, 255, .03);
         overflow: auto;
     }
 
@@ -323,7 +378,7 @@
         margin: 0;
         padding: 14px 16px;
         border-left: 3px solid var(--orange);
-        background: rgba(249,115,22,.06);
+        background: rgba(249, 115, 22, .06);
         border-radius: 0;
         clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
         color: var(--text-dim);
@@ -336,11 +391,11 @@
 
     .preview-frame {
         margin-top: 18px;
-        border: 1px solid rgba(255,255,255,.08);
+        border: 1px solid rgba(255, 255, 255, .08);
         border-radius: 6px;
         clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
         overflow: hidden;
-        background: rgba(255,255,255,.02);
+        background: rgba(255, 255, 255, .02);
         animation: framePulse 7s ease-in-out infinite;
     }
 
@@ -349,15 +404,15 @@
         align-items: center;
         gap: 8px;
         padding: 14px 16px;
-        border-bottom: 1px solid rgba(255,255,255,.07);
-        background: rgba(255,255,255,.02);
+        border-bottom: 1px solid rgba(255, 255, 255, .07);
+        background: rgba(255, 255, 255, .02);
     }
 
     .preview-dot {
         width: 9px;
         height: 9px;
         border-radius: 0;
-        background: rgba(255,255,255,.22);
+        background: rgba(255, 255, 255, .22);
     }
 
     .preview-label {
@@ -384,15 +439,15 @@
     .annotation-panel {
         margin-top: 20px;
         padding-top: 20px;
-        border-top: 1px solid rgba(255,255,255,.08);
+        border-top: 1px solid rgba(255, 255, 255, .08);
     }
 
     .annotation-panel pre {
         margin: 12px 0 0;
         padding: 14px;
         border-radius: 6px;
-        border: 1px solid rgba(255,255,255,.08);
-        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(255, 255, 255, .08);
+        background: rgba(255, 255, 255, .03);
         color: var(--text-muted);
         white-space: pre-wrap;
     }
@@ -410,15 +465,15 @@
     }
 
     .report-secondary {
-        background: rgba(255,255,255,.03);
-        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255, 255, 255, .03);
+        border: 1px solid rgba(255, 255, 255, .08);
     }
 
     .report-card-rise {
         opacity: 0;
         transform: translateY(26px) scale(.985);
         filter: blur(8px);
-        transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1), filter .9s cubic-bezier(.16,1,.3,1);
+        transition: opacity .9s cubic-bezier(.16, 1, .3, 1), transform .9s cubic-bezier(.16, 1, .3, 1), filter .9s cubic-bezier(.16, 1, .3, 1);
     }
 
     .page-motion .report-card-rise.is-visible {
@@ -428,11 +483,14 @@
     }
 
     @keyframes framePulse {
-        0%, 100% {
-            box-shadow: 0 0 0 rgba(249,115,22,0);
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 rgba(249, 115, 22, 0);
         }
+
         50% {
-            box-shadow: 0 0 32px rgba(249,115,22,.08);
+            box-shadow: 0 0 32px rgba(249, 115, 22, .08);
         }
     }
 
@@ -447,6 +505,7 @@
     }
 
     @media (max-width: 1100px) {
+
         .report-shell,
         .report-hero {
             grid-template-columns: 1fr;
@@ -454,6 +513,7 @@
     }
 
     @media (max-width: 760px) {
+
         .review-panel,
         .warning-panel,
         .sticky-card,
@@ -473,8 +533,8 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    hljs.highlightAll();
-});
+    document.addEventListener('DOMContentLoaded', function () {
+        hljs.highlightAll();
+    });
 </script>
 {% endblock %}

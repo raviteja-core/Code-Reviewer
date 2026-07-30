@@ -2,8 +2,11 @@
 Development configuration for when Supabase is not available
 """
 import os
+import logging
 from typing import Optional, Dict, Any, List
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 class MockSupabaseManager:
     """Mock Supabase manager for development without database"""
@@ -13,7 +16,7 @@ class MockSupabaseManager:
         self.submissions = {}
         self.next_user_id = 1
         self.next_submission_id = 1
-        print("Running in development mode with mock database")
+        logger.info("Running in development mode with mock database manager.")
     
     def get_user_by_id(self, user_id: int) -> Optional[Dict[str, Any]]:
         """Get user by ID"""
@@ -37,6 +40,7 @@ class MockSupabaseManager:
         }
         self.users[self.next_user_id] = user_data
         self.next_user_id += 1
+        logger.info(f"Mock user created: {email} (ID: {user_data['id']})")
         return user_data
     
     def get_user_submissions(self, user_id: int) -> List[Dict[str, Any]]:
@@ -62,12 +66,14 @@ class MockSupabaseManager:
         }
         self.submissions[self.next_submission_id] = submission_data
         self.next_submission_id += 1
+        logger.info(f"Mock submission created: ID {submission_data['id']} for user ID {user_id}")
         return submission_data
     
     def update_submission(self, submission_id: int, **kwargs) -> Optional[Dict[str, Any]]:
         """Update a submission"""
         if submission_id in self.submissions:
             self.submissions[submission_id].update(kwargs)
+            logger.info(f"Mock submission updated: ID {submission_id}")
             return self.submissions[submission_id]
         return None
     
@@ -81,4 +87,4 @@ class MockSupabaseManager:
 
 def get_mock_supabase_manager():
     """Get mock Supabase manager for development"""
-    return MockSupabaseManager() 
+    return MockSupabaseManager()
